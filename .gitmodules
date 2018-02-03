@@ -1,3 +1,6 @@
 [submodule "lib/libnmea"]
 	path = lib/libnmea
 	url = https://github.com/sorchowski/libnmea
+[submodule "lib/ArduinoLibs"]
+	path = lib/ArduinoLibs
+	url = https://github.com/sorchowski/ArduinoLibs
