@@ -1,0 +1,24 @@
+Option 1 - Do it yourself
+
+Kinetic on Raspberry PI
+
+http://wiki.ros.org/ROSberryPi/Installing%20ROS%20Kinetic%20on%20the%20Raspberry%20Pi
+
+Ubuntu install of ROS kinetic:
+
+http://wiki.ros.org/kinetic/Installation/Ubuntu
+
+	Other Instructions:
+
+	https://www.intorobotics.com/how-to-install-ros-kinetic-on-raspberry-pi-3-ubuntu-mate/
+
+Issue of installing ROS Kinetic on Ubuntu Mate:	
+
+https://answers.ros.org/question/241773/ros-kinetic-on-ubuntu-mate-1604-armhf-raspberry-pi-3/
+
+Option 2 - Use Pre-installed image of ROS/Ubuntu: 
+
+	http://www.german-robot.com/2016/05/26/raspberry-pi-sd-card-image/
+
+Option 3 - Use Ubiquity Robots image
+

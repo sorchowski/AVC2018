@@ -1,0 +1,45 @@
+
+Distro used: Ubuntu MATE
+
+Initial network setup:
+	Added iface wlan0 inet dhcp
+	To /etc/network/configuration
+
+Followed with establishment of static ip in same file above (/etc/network/configuration):
+	Iface wlan0 inet static
+		Address 192.168.1.150
+		Network 192.168.1.0
+		Netmask 255.255.255.0
+		Broadcast 192.168.1.255
+		Gateway 192.168.1.1
+		Dns-nameservers 192.168.1.1
+
+That didn’t work, so just ended up setting up wireless config via the administrator control gui
+	
+Setup SSH: https://www.raspberrypi.org/documentation/remote-access/ssh/README.md
+
+Setup VNC: https://www.raspberrypi.org/documentation/remote-access/vnc/README.md
+
+	Vncpasswd - to setup a password for the user
+	Vncserver :1 - to start the service
+	Vncserver -kill :1 - to stop the service
+
+	Installed:
+		Sudo apt-get install light-themes
+		sudo apt-get install --no-install-recommends gnome-panel gnome-settings-daemon metacity nautilus gnome-terminal
+
+	Helpful sites:
+		https://www.google.com/search?q=ubuntu+mate+how+to+start+vnc&rlz=1C1CHBF_enUS721US721&oq=ubuntu+mate+how+to+start+vnc&aqs=chrome..69i57j0.3345j0j7&sourceid=chrome&ie=UTF-8#kpvalbx=1
+
+	https://askubuntu.com/questions/800302/vncserver-grey-screen-ubuntu-16-04-lts
+	
+
+	Enable on boot:
+		https://poweruphosting.com/blog/setup-vnc-server-on-ubuntu/
+
+
+How to fix “failed load kernel modules”
+
+	https://askubuntu.com/questions/779251/what-to-do-after-failed-to-start-load-kernel-modules
+
+

@@ -1,0 +1,3 @@
+[submodule "lib/libnmea"]
+	path = lib/libnmea
+	url = https://github.com/sorchowski/libnmea
