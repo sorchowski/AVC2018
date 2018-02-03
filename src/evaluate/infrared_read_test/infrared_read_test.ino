@@ -13,6 +13,9 @@ void setup()
 {
   LCD.begin(9600);// all SerLCDs come at 9600 Baud by default
   delay(3000);
+  resetDefault();
+  set_16x2();
+  delay(3000);
 }
 //-------------------------------------------------------------------------------------------
 void loop()
@@ -20,7 +23,7 @@ void loop()
   delay(500);
   clearScreen();
   selectLineOne();
-  int infraredReadValue = analogRead(A3);
+  int infraredReadValue = analogRead(A2);
   String infraredReadingValueStr = String(infraredReadValue);
   LCD.print(infraredReadingValueStr);
 }
@@ -44,20 +47,6 @@ void turnDisplayOn()
   //this turns the dispaly back ON
   LCD.write(0xFE); //command flag
   LCD.write(12); // 0x0C
-}
-
-void changeBaud(){
-  LCD.write(0x7C);// special command byte => 0d124 or 0x7C
-  LCD.write(0x0B); //change current baud to 2400 baud
-
-  /*ASCII Value to hex
-  2400 baud, "<control>k" => 0x0B
-  4800 baud, "<control>l" => 0x0C
-  9600 baud, "<control>m" => 0x0D
-  14400 baud, "<control>n" => 0x0E
-  19200 baud, "<control>o" => 0x0F
-  38400 baud, "<control>p" => 0x10
-  reset to default baud while LCD is the splash screen is still active, "<control>r" => 0x12*/
 }
 
 void set_16x2(){//set character LCD as 16x2
