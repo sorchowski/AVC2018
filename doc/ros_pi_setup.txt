@@ -1,0 +1,86 @@
+Following instructions at: http://wiki.ros.org/ROSberryPi/Installing%20ROS%20Kinetic%20on%20the%20Raspberry%20Pi
+
+$ sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
+$ sudo apt-key adv --keyserver hkp://ha.pool.sks-keyservers.net:80 --recv-key 421C365BD9FF1F717815A3895523BAEEB01FA116
+
+$ sudo apt-get update
+$ sudo apt-get upgrade
+
+$ sudo apt-get install -y python-rosdep python-rosinstall-generator python-wstool python-rosinstall build-essential cmake
+
+$ sudo rosdep init
+$ rosdep update
+
+$ mkdir -p ~/ros_catkin_ws
+$ cd ~/ros_catkin_ws
+
+$ rosinstall_generator ros_comm --rosdistro kinetic --deps --wet-only --tar > kinetic-ros_comm-wet.rosinstall
+$ wstool init src kinetic-ros_comm-wet.rosinstall
+
+$ rosinstall_generator desktop --rosdistro kinetic --deps --wet-only --tar > kinetic-desktop-wet.rosinstall
+$ wstool init src kinetic-desktop-wet.rosinstall
+
+mkdir -p ~/ros_catkin_ws/external_src
+cd ~/ros_catkin_ws/external_src
+wget http://sourceforge.net/projects/assimp/files/assimp-3.1/assimp-3.1.1_no_test_models.zip/download -O assimp-3.1.1_no_test_models.zip
+unzip assimp-3.1.1_no_test_models.zip
+cd assimp-3.1.1
+cmake .
+make
+sudo make install
+
+
+
+This command caused a stacktrace error:
+
+	$ rosdep install -y --from-paths src --ignore-src --rosdistro kinetic -r --os=debian:jessie
+
+	this was because I executed both commands under section 3.1 "Create a catkin workspace". needed to just execute the desktop command
+
+	but then got the below. Ignoring this for now.
+
+	ERROR: the following rosdeps failed to install
+  		apt: command [sudo -H apt-get install -y libprotobuf9] failed
+  		apt: command [sudo -H apt-get install -y libjpeg62-turbo-dev] failed
+  		apt: Failed to detect successful installation of [libprotobuf9]
+  		apt: Failed to detect successful installation of [libjpeg62-turbo-dev]
+
+
+Build the catkin workspace:
+
+cd ~/ros_catkin_ws
+sudo ./src/catkin/bin/catkin_make_isolated --install -DCMAKE_BUILD_TYPE=Release --install-space /opt/ros/kinetic -j2
+
+
+
+Then hit:
+
+==> make -j2 in '/home/steveo/ros_catkin_ws/build_isolated/collada_parser'
+Scanning dependencies of target collada_parser
+[ 25%] Building CXX object CMakeFiles/collada_parser.dir/src/collada_parser.cpp.o
+/home/steveo/ros_catkin_ws/src/collada_urdf/collada_parser/src/collada_parser.cpp:48:17: fatal error: dae.h: No such file or directory
+compilation terminated.
+CMakeFiles/collada_parser.dir/build.make:62: recipe for target 'CMakeFiles/collada_parser.dir/src/collada_parser.cpp.o' failed
+make[2]: *** [CMakeFiles/collada_parser.dir/src/collada_parser.cpp.o] Error 1
+CMakeFiles/Makefile2:227: recipe for target 'CMakeFiles/collada_parser.dir/all' failed
+make[1]: *** [CMakeFiles/collada_parser.dir/all] Error 2
+Makefile:138: recipe for target 'all' failed
+make: *** [all] Error 2
+<== Failed to process package 'collada_parser':
+  Command '['/opt/ros/kinetic/env.sh', 'make', '-j2']' returned non-zero exit status 2
+
+Reproduce this error by running:
+==> cd /home/steveo/ros_catkin_ws/build_isolated/collada_parser && /opt/ros/kinetic/env.sh make -j2
+
+Command failed, exiting.
+steveo@robosteve:~/ros_catkin_ws$
+
+
+
+
+This sucks. Forget installing from sources.
+
+Just follow the instructions here: http://wiki.ros.org/kinetic/Installation/Ubuntu
+
+
+

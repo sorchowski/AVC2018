@@ -1,0 +1,65 @@
+
+
+rosdep update
+
+List all the ros packages:
+	rospack list
+
+Find location of ros package:
+	rospack find <package name>
+
+
+View the files in a package directory:
+	rosls <package name>
+
+Jump to a ros package directory:
+	roscd <package name>
+
+Start a ros node:
+	rosrun <package-name> <executable-name>
+
+Get list of running ros nodes:
+	rosnode list
+
+Inspect a node:
+	rosnode info <node name>
+
+Kill a node:
+	rosnode kill <node name>
+
+Remove dead nodes:
+	rosnode cleanup
+
+See a graphical representation of the nodes:
+	rqt_graph
+
+GEt a list of active topics:
+	rostopic list
+
+Dump actual messages that are published on a single topic:
+	rostopic echo <topic name>
+
+See the speed of message publication rates:
+	rostopic hz <topic-name>
+
+See the bandwidth consumed by messages:
+	rostopic bw <topic-name>
+
+Inspect a topic:
+	rostopic info <topic name>
+
+Show message type:
+	rosmsg show <message-type-name>
+
+Publish a message manually from the command line:
+	rostopic pub -r <rate-in-hz> <topic-name> <message-type> <message-content>
+
+Check health of system:
+	roswtf
+
+Example:
+
+
+	roscore
+	rosrun turtlesim turtlesim_node
+	rosrun turtlesim turtle_teleop_key
