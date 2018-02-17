@@ -19,3 +19,5 @@ rm -rf /c/Users/steve/Documents/Arduino/libraries/ros_lib/src/*.*
 cp -R ArduinoLibs/ros_lib/* /c/Users/steve/Documents/Arduino/libraries/ros_lib/src
 mv /c/Users/steve/Documents/Arduino/libraries/ros_lib/src/library.properties /c/Users/steve/Documents/Arduino/libraries/ros_lib/
 
+mkdir -p /c/Users/steve/Documents/Arduino/libraries/ros_topics
+cp topic/ros_topics.h /c/Users/steve/Documents/Arduino/libraries/ros_topics/
