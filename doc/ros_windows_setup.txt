@@ -29,4 +29,3 @@ http://wiki.ros.org/rosserial_arduino/Tutorials/Arduino%20IDE%20Setup
 	rosrun rosserial_arduino make_libraries.py .
 
 	# Then copy over the contents of the "ard_libs" directory to the arduino libraries directory
-	the linux filesystem resides under c:\Users\steveo\AppData\Local\lxss\home\steve\
