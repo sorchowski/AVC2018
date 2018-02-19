@@ -1,17 +1,16 @@
 
-CC=gcc
+CC=g++
 LIBS=-lnmea
-IDIR=../../../lib/common
-CFLAGS=-I$(IDIR)
-DEPS=$(IDIR)
+INCLUDES=-I../../../lib/common
+SOURCES=node_read_gps.cpp
+OBJECTS=$(SOURCES:.cpp=.o)
+EXECUTABLE=node_read_gps
 
-%.o: %.c $(DEPS)
-	$(CC) -c -o $@ $< $(CFLAGS)
+# $@ is the left-hand side of the :
+# $< is the right-hand side of the :
 
-nodegps: node_read_gps.o
-	$(CC) -o node_read_gps node_read_gps.o $(LIBS) $(CFLAGS)
+%.o: %.cpp
+	$(CC) $(INCLUDES) -c -o $@ $<
 
-.PHONY: clean
-
-clean:
-	rm -f *.o node_read_gps
+$(EXECUTABLE): $(OBJECTS)
+	$(CC) $(OBJECTS) -o $@ -v $(LIBS)

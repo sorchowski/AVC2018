@@ -16,10 +16,10 @@
 
 #include <nmea.h>
 #include <nmea/gpgll.h>
-#include <nmea/gpgaa.h>
+#include <nmea/gpgga.h>
 
-#include <ros_topics.h>
-#include <device_paths.h>
+#include "ros_topics.h"
+#include "device_paths.h"
 
 struct termios tty;
 struct termios tty_old;
@@ -63,7 +63,7 @@ int configure_usb(int ser_fd) {
 
 int main() {
 
-        char * real_path = realpath(avc_common::ROS_NODE_DEVICE_PATH_GPS, NULL);
+        char * real_path = realpath(device_paths::ROS_NODE_DEVICE_PATH_GPS, NULL);
         if (real_path != NULL) {
                 printf("real path returned: %s\n", real_path);
         }
@@ -81,18 +81,37 @@ int main() {
 
 	configure_usb(usb_fd);
 
-	char buffer[200];
+	char buffer[4096];
 
 	while (1) {
     		int n = read(usb_fd, buffer, sizeof(buffer));
 		if (n > 0) {
 			printf("read %d bytes\n", n);
-			printf("%.*s\n",n, buffer);
+			//printf("%.*s",n, buffer);
+			buffer[n] = 0;
+			printf("buffer string: %s",buffer);
 
-			data = nmea_parse(buffer, strlen(buffer), 0);
-			if (NULL == data) {
-				exit(EXIT_FAILURE);
+			/*
+			if (nmea_has_checksum(buffer, strlen(buffer)) == 0) {
+				uint8_t checksum = nmea_get_checksum(buffer);
+				int validation_result = nmea_validate(buffer, strlen(buffer), 1);
+
+				printf("validation_result: %d\n",validation_result);
 			}
+			*/
+			if (nmea_validate(buffer, strlen(buffer), 1) == 0) {
+				printf("validate success\n");
+				data = nmea_parse(buffer, strlen(buffer), 1);
+				if (NULL == data) {
+					printf("data is null");
+				}
+				else {
+					printf("data is NOT null");
+					nmea_free(data);
+				}
+			}
+			
+			/*
 			if (NMEA_GPGGA == data->type) {
 				nmea_gpgga_s *gpgga = (nmea_gpgga_s *) data;
 
@@ -114,8 +133,9 @@ int main() {
 				printf("  Minutes: %f\n", gpgll->latitude.minutes);
 				printf("  Cardinal: %c\n", (char) gpgll->latitude.cardinal);
 			}
-
+			
 			nmea_free(data);
+			*/
 		}
 		else {
 			printf("read 0 bytes\n");
