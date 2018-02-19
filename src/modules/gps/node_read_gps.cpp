@@ -14,8 +14,18 @@
 #include <cstdio>
 #include <stdlib.h>
 
+#include <nmea.h>
+#include <nmea/gpgll.h>
+#include <nmea/gpgaa.h>
+
+#include <ros_topics.h>
+#include <device_paths.h>
+
 struct termios tty;
 struct termios tty_old;
+
+// Will contain parsed gps data
+nmea_s * data;
 
 int configure_usb(int ser_fd) {
 	if (tcgetattr(ser_fd, &tty) != 0) {
@@ -53,8 +63,7 @@ int configure_usb(int ser_fd) {
 
 int main() {
 
-	const char * rosnode_path = "/dev/rosnode_gps";
-        char * real_path = realpath(rosnode_path, NULL);
+        char * real_path = realpath(avc_common::ROS_NODE_DEVICE_PATH_GPS, NULL);
         if (real_path != NULL) {
                 printf("real path returned: %s\n", real_path);
         }
@@ -79,6 +88,34 @@ int main() {
 		if (n > 0) {
 			printf("read %d bytes\n", n);
 			printf("%.*s\n",n, buffer);
+
+			data = nmea_parse(buffer, strlen(buffer), 0);
+			if (NULL == data) {
+				exit(EXIT_FAILURE);
+			}
+			if (NMEA_GPGGA == data->type) {
+				nmea_gpgga_s *gpgga = (nmea_gpgga_s *) data;
+
+				printf("GPGGA Sentence\n");
+				printf("Number of satellites: %d\n", gpgga->n_satellites);
+				printf("Altitude: %d %c\n", gpgga->altitude, gpgga->altitude_unit);
+			}
+
+			if (NMEA_GPGLL == data->type) {
+				nmea_gpgll_s *gpgll = (nmea_gpgll_s *) data;
+
+				printf("GPGLL Sentence\n");
+				printf("Longitude:\n");
+				printf("  Degrees: %d\n", gpgll->longitude.degrees);
+				printf("  Minutes: %f\n", gpgll->longitude.minutes);
+				printf("  Cardinal: %c\n", (char) gpgll->longitude.cardinal);
+				printf("Latitude:\n");
+				printf("  Degrees: %d\n", gpgll->latitude.degrees);
+				printf("  Minutes: %f\n", gpgll->latitude.minutes);
+				printf("  Cardinal: %c\n", (char) gpgll->latitude.cardinal);
+			}
+
+			nmea_free(data);
 		}
 		else {
 			printf("read 0 bytes\n");
