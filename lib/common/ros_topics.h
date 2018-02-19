@@ -1,7 +1,7 @@
 #ifndef ROS_TOPICS_H
 #define ROS_TOPICS_H
 
-namespace ros_topics
+namespace avc_common
 {
 	static const char* ROS_TOPIC_SONAR      = "ros_topic_sonar";
 	static const char* ROS_TOPIC_IMU        = "ros_topic_imu";

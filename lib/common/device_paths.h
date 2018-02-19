@@ -1,7 +1,7 @@
 #ifndef DEVICE_PATHS
 #define DEVICE_PATHS
 
-namespace device_paths
+namespace avc_common
 {
 	static const char * ROS_NODE_DEVICE_PATH_GPS = "/dev/rosnode_gps";
 }

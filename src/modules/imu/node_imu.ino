@@ -21,8 +21,8 @@ ros::NodeHandle nh;
 sensor_msgs::Imu imu_message;
 sensor_msgs::MagneticField  mag_message;
 
-ros::Publisher imuPublisher(ros_topics::ROS_TOPIC_IMU, &imu_message);
-ros::Publisher magPublisher(ros_topics::ROS_TOPIC_MAG, &mag_message);
+ros::Publisher imuPublisher(avc_common::ROS_TOPIC_IMU, &imu_message);
+ros::Publisher magPublisher(avc_common::ROS_TOPIC_MAG, &mag_message);
 
 void setup()
 {

@@ -5,6 +5,7 @@
  *
  */
 
+// C++ includes
 #include <stdio.h>
 #include <termios.h>
 #include <errno.h>
@@ -14,12 +15,23 @@
 #include <cstdio>
 #include <stdlib.h>
 
+// libnmea includes
 #include <nmea.h>
 #include <nmea/gpgll.h>
 #include <nmea/gpgga.h>
+#include <nmea/gprmc.h>
 
+// ROS includes
+#include "ros/ros.h"
+#include "sensor_msgs/NavSatFix.h"
+
+// AVC includes
 #include "ros_topics.h"
 #include "device_paths.h"
+#include "node_names.h"
+
+// Way overkill, but meh...
+#define READ_BUFFER_SIZE 4096  
 
 struct termios tty;
 struct termios tty_old;
@@ -61,17 +73,19 @@ int configure_usb(int ser_fd) {
 	return 0;
 }
 
-int main() {
+int main(int argc, char **argv) {
 
-        char * real_path = realpath(device_paths::ROS_NODE_DEVICE_PATH_GPS, NULL);
-        if (real_path != NULL) {
-                printf("real path returned: %s\n", real_path);
-        }
-        else {
-                printf("failed to read real path: %d\n", errno);
-                std::exit(1);
-        }
+	// Setup the device path
+	char * real_path = realpath(avc_common::ROS_NODE_DEVICE_PATH_GPS, NULL);
+	if (real_path != NULL) {
+		printf("real path returned: %s\n", real_path);
+	}
+	else {
+		printf("failed to read real path: %d\n", errno);
+		std::exit(1);
+	}
 
+	// Open the serial port associated with the gps device
 	int usb_fd = open(real_path, O_RDWR|O_NOCTTY);
 	free(real_path);
 	if (usb_fd < 0) {
@@ -79,66 +93,100 @@ int main() {
 		std::exit(1);
 	}
 
+	// Initialize ROS stuff
+	ros::init(argc, argv, node_names::NODE_NAME_GPS);
+	ros::NodeHandle nh;
+	ros::Publisher navsatfix_pub = nh.advertise<sensor_msgs::NavSatFix>(avc_common::ROS_TOPIC_GPS, 10);
+
+	// The GPS device will send messages to this program at a set rate, so that
+	// frequency should govern the rate at which ROS messages are sent into the system.
+	//ros::Rate loop_rate(10);
+
+	// Initialize the serial connection to the GPS device with correct read settings
 	configure_usb(usb_fd);
 
-	char buffer[4096];
+	char buffer[READ_BUFFER_SIZE];
 
-	while (1) {
-    		int n = read(usb_fd, buffer, sizeof(buffer));
+	while (ros::ok()) {
+		int n = read(usb_fd, buffer, sizeof(buffer));
 		if (n > 0) {
-			printf("read %d bytes\n", n);
 			//printf("%.*s",n, buffer);
 			buffer[n] = 0;
 			printf("buffer string: %s",buffer);
 
-			/*
-			if (nmea_has_checksum(buffer, strlen(buffer)) == 0) {
-				uint8_t checksum = nmea_get_checksum(buffer);
-				int validation_result = nmea_validate(buffer, strlen(buffer), 1);
-
-				printf("validation_result: %d\n",validation_result);
-			}
-			*/
+			// Validate the nmea sentence first, "1" tells it to validate the checksum
 			if (nmea_validate(buffer, strlen(buffer), 1) == 0) {
-				printf("validate success\n");
+
 				data = nmea_parse(buffer, strlen(buffer), 1);
+
 				if (NULL == data) {
 					printf("data is null");
 				}
 				else {
-					printf("data is NOT null");
+					sensor_msgs::NavSatFix navsatfix_msg;
+
+					if (NMEA_GPGGA == data->type) {
+						nmea_gpgga_s *gpgga = (nmea_gpgga_s *) data;
+
+						printf("GPGGA Sentence\n");
+						printf("Number of satellites: %d\n", gpgga->n_satellites);
+						printf("Altitude: %d %c\n", gpgga->altitude, gpgga->altitude_unit);
+						printf("Longitude:\n");
+						printf("  Degrees: %d\n", gpgga->longitude.degrees);
+						printf("  Minutes: %f\n", gpgga->longitude.minutes);
+						printf("  Cardinal: %c\n", (char) gpgga->longitude.cardinal);
+						printf("Latitude:\n");
+						printf("  Degrees: %d\n", gpgga->latitude.degrees);
+						printf("  Minutes: %f\n", gpgga->latitude.minutes);
+						printf("  Cardinal: %c\n", (char) gpgga->latitude.cardinal);
+						gpgga->
+					}
+
+					if (NMEA_GPGLL == data->type) {
+						nmea_gpgll_s *gpgll = (nmea_gpgll_s *) data;
+
+						printf("GPGLL Sentence\n");
+						printf("Longitude:\n");
+						printf("  Degrees: %d\n", gpgll->longitude.degrees);
+						printf("  Minutes: %f\n", gpgll->longitude.minutes);
+						printf("  Cardinal: %c\n", (char) gpgll->longitude.cardinal);
+						printf("Latitude:\n");
+						printf("  Degrees: %d\n", gpgll->latitude.degrees);
+						printf("  Minutes: %f\n", gpgll->latitude.minutes);
+						printf("  Cardinal: %c\n", (char) gpgll->latitude.cardinal);
+					}
+
+					if (NMEA_GPRMC == data->type) {
+						nmea_gprmc_s *gprmc = (nmea_gprmc_s *) data;
+						printf("GPRMC Sentence\n");
+						printf("Longitude:\n");
+						printf("  Degrees: %d\n", gprmc->longitude.degrees);
+						printf("  Minutes: %f\n", gprmc->longitude.minutes);
+						printf("  Cardinal: %c\n", (char) gprmc->longitude.cardinal);
+						printf("Latitude:\n");
+						printf("  Degrees: %d\n", gprmc->latitude.degrees);
+						printf("  Minutes: %f\n", gprmc->latitude.minutes);
+						printf("  Cardinal: %c\n", (char) gprmc->latitude.cardinal);
+					}
+
+
+					navsatfix_pub.publish(navsatfix_msg);
+					ros::spinOnce();
+
 					nmea_free(data);
 				}
 			}
-			
-			/*
-			if (NMEA_GPGGA == data->type) {
-				nmea_gpgga_s *gpgga = (nmea_gpgga_s *) data;
-
-				printf("GPGGA Sentence\n");
-				printf("Number of satellites: %d\n", gpgga->n_satellites);
-				printf("Altitude: %d %c\n", gpgga->altitude, gpgga->altitude_unit);
-			}
-
-			if (NMEA_GPGLL == data->type) {
-				nmea_gpgll_s *gpgll = (nmea_gpgll_s *) data;
-
-				printf("GPGLL Sentence\n");
-				printf("Longitude:\n");
-				printf("  Degrees: %d\n", gpgll->longitude.degrees);
-				printf("  Minutes: %f\n", gpgll->longitude.minutes);
-				printf("  Cardinal: %c\n", (char) gpgll->longitude.cardinal);
-				printf("Latitude:\n");
-				printf("  Degrees: %d\n", gpgll->latitude.degrees);
-				printf("  Minutes: %f\n", gpgll->latitude.minutes);
-				printf("  Cardinal: %c\n", (char) gpgll->latitude.cardinal);
-			}
-			
-			nmea_free(data);
-			*/
+			else {
+				printf("nmea sentence NOT valid\n")
+			}			
 		}
 		else {
 			printf("read 0 bytes\n");
 		}
+	}
+
+	// cleanup
+	if (close(usb_fd) != 0) {
+		printf("Error closing usb port: %d\n", errno);
 	}
 }
