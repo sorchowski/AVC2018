@@ -1,7 +1,9 @@
 
 CC=g++
-LIBS=-lnmea
-INCLUDES=-I../../../lib/common
+LIBS=-lnmea -lroscpp_serialization -lroscpp -lrosconsole -lrostime
+LFLAGS=-L/opt/ros/kinetic/lib
+#SHARED==Wl,-rpath,/opt/ros/kinetic/lib
+INCLUDES=-I../../../lib/common -I/opt/ros/kinetic/include
 SOURCES=node_read_gps.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
 EXECUTABLE=node_read_gps
@@ -13,4 +15,4 @@ EXECUTABLE=node_read_gps
 	$(CC) $(INCLUDES) -c -o $@ $<
 
 $(EXECUTABLE): $(OBJECTS)
-	$(CC) $(OBJECTS) -o $@ -v $(LIBS)
+	$(CC) $(OBJECTS) -o $@ -v $(LFLAGS) $(LIBS)

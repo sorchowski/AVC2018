@@ -94,9 +94,9 @@ int main(int argc, char **argv) {
 	}
 
 	// Initialize ROS stuff
-	ros::init(argc, argv, node_names::NODE_NAME_GPS);
-	ros::NodeHandle nh;
-	ros::Publisher navsatfix_pub = nh.advertise<sensor_msgs::NavSatFix>(avc_common::ROS_TOPIC_GPS, 10);
+	//ros::init(argc, argv, avc_common::NODE_NAME_GPS);
+	//ros::NodeHandle nh;
+	//ros::Publisher navsatfix_pub = nh.advertise<sensor_msgs::NavSatFix>(avc_common::ROS_TOPIC_GPS, 10);
 
 	// The GPS device will send messages to this program at a set rate, so that
 	// frequency should govern the rate at which ROS messages are sent into the system.
@@ -107,7 +107,7 @@ int main(int argc, char **argv) {
 
 	char buffer[READ_BUFFER_SIZE];
 
-	while (ros::ok()) {
+	while (1) {//ros::ok()) {
 		int n = read(usb_fd, buffer, sizeof(buffer));
 		if (n > 0) {
 			//printf("%.*s",n, buffer);
@@ -139,7 +139,6 @@ int main(int argc, char **argv) {
 						printf("  Degrees: %d\n", gpgga->latitude.degrees);
 						printf("  Minutes: %f\n", gpgga->latitude.minutes);
 						printf("  Cardinal: %c\n", (char) gpgga->latitude.cardinal);
-						gpgga->
 					}
 
 					if (NMEA_GPGLL == data->type) {
@@ -170,14 +169,14 @@ int main(int argc, char **argv) {
 					}
 
 
-					navsatfix_pub.publish(navsatfix_msg);
-					ros::spinOnce();
+					//navsatfix_pub.publish(navsatfix_msg);
+					//ros::spinOnce();
 
 					nmea_free(data);
 				}
 			}
 			else {
-				printf("nmea sentence NOT valid\n")
+				printf("nmea sentence NOT valid\n");
 			}			
 		}
 		else {
