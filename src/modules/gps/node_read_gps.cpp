@@ -3,6 +3,10 @@
  *
  * utilizes sensors_msgs/NavSatFix.h
  *
+ *
+ * Decimal Degrees = degrees + (minutes/60) + (seconds/3600)
+ *
+ * source: https://www.latlong.net/degrees-minutes-seconds-to-decimal-degrees
  */
 
 // C++ includes
@@ -14,6 +18,7 @@
 #include <cstdlib>
 #include <cstdio>
 #include <stdlib.h>
+#include <time.h>
 
 // libnmea includes
 #include <nmea.h>
@@ -94,9 +99,9 @@ int main(int argc, char **argv) {
 	}
 
 	// Initialize ROS stuff
-	//ros::init(argc, argv, avc_common::NODE_NAME_GPS);
-	//ros::NodeHandle nh;
-	//ros::Publisher navsatfix_pub = nh.advertise<sensor_msgs::NavSatFix>(avc_common::ROS_TOPIC_GPS, 10);
+	ros::init(argc, argv, avc_common::NODE_NAME_GPS);
+	ros::NodeHandle nh;
+	ros::Publisher navsatfix_pub = nh.advertise<sensor_msgs::NavSatFix>(avc_common::ROS_TOPIC_GPS, 10);
 
 	// The GPS device will send messages to this program at a set rate, so that
 	// frequency should govern the rate at which ROS messages are sent into the system.
@@ -107,7 +112,7 @@ int main(int argc, char **argv) {
 
 	char buffer[READ_BUFFER_SIZE];
 
-	while (1) {//ros::ok()) {
+	while (ros::ok()) {
 		int n = read(usb_fd, buffer, sizeof(buffer));
 		if (n > 0) {
 			//printf("%.*s",n, buffer);
@@ -139,38 +144,57 @@ int main(int argc, char **argv) {
 						printf("  Degrees: %d\n", gpgga->latitude.degrees);
 						printf("  Minutes: %f\n", gpgga->latitude.minutes);
 						printf("  Cardinal: %c\n", (char) gpgga->latitude.cardinal);
+
+						struct timespec tnow;
+						if (clock_gettime(CLOCK_REALTIME, &tnow) == 0) {
+							navsatfix_msg.header.stamp.sec = tnow.tv_sec;
+							navsatfix_msg.header.stamp.nsec = tnow.tv_nsec;
+						}
+
+						int degrees_latitude = gpgga->latitude.degrees;
+						double minutes_latitude = gpgga->latitude.minutes;
+						int degrees_longitude = gpgga->longitude.degrees;
+						double minutes_longitude = gpgga->longitude.minutes;
+
+						// TODO: fix this, it doesn't seem right.	
+						double decimal_latitude = degrees_latitude+(minutes_latitude/60);
+						if (gpgga->latitude.cardinal == 'S') {
+							navsatfix_msg.latitude = decimal_latitude * -1;
+						} else {
+							navsatfix_msg.latitude = decimal_latitude;
+						}
+
+						// TODO: fix this, it doesn't seem right.
+						double decimal_longitude = degrees_longitude+(minutes_longitude/60);
+						if (gpgga->longitude.cardinal == 'W') {
+							navsatfix_msg.longitude = decimal_longitude * -1;
+						} else {
+							navsatfix_msg.longitude = decimal_longitude;
+						}
+					
+						navsatfix_msg.altitude = gpgga->altitude; // Currently in meters
+	
+						navsatfix_pub.publish(navsatfix_msg);
+                                        	ros::spinOnce();
 					}
 
 					if (NMEA_GPGLL == data->type) {
 						nmea_gpgll_s *gpgll = (nmea_gpgll_s *) data;
-
-						printf("GPGLL Sentence\n");
-						printf("Longitude:\n");
-						printf("  Degrees: %d\n", gpgll->longitude.degrees);
-						printf("  Minutes: %f\n", gpgll->longitude.minutes);
-						printf("  Cardinal: %c\n", (char) gpgll->longitude.cardinal);
-						printf("Latitude:\n");
-						printf("  Degrees: %d\n", gpgll->latitude.degrees);
-						printf("  Minutes: %f\n", gpgll->latitude.minutes);
-						printf("  Cardinal: %c\n", (char) gpgll->latitude.cardinal);
+						// NOT CURRENTLY USED
 					}
 
 					if (NMEA_GPRMC == data->type) {
 						nmea_gprmc_s *gprmc = (nmea_gprmc_s *) data;
-						printf("GPRMC Sentence\n");
-						printf("Longitude:\n");
-						printf("  Degrees: %d\n", gprmc->longitude.degrees);
-						printf("  Minutes: %f\n", gprmc->longitude.minutes);
-						printf("  Cardinal: %c\n", (char) gprmc->longitude.cardinal);
-						printf("Latitude:\n");
-						printf("  Degrees: %d\n", gprmc->latitude.degrees);
-						printf("  Minutes: %f\n", gprmc->latitude.minutes);
-						printf("  Cardinal: %c\n", (char) gprmc->latitude.cardinal);
+						//printf("GPRMC Sentence\n");
+						//printf("Longitude:\n");
+						//printf("  Degrees: %d\n", gprmc->longitude.degrees);
+						//printf("  Minutes: %f\n", gprmc->longitude.minutes);
+						//printf("  Cardinal: %c\n", (char) gprmc->longitude.cardinal);
+						//printf("Latitude:\n");
+						//printf("  Degrees: %d\n", gprmc->latitude.degrees);
+						//printf("  Minutes: %f\n", gprmc->latitude.minutes);
+						//printf("  Cardinal: %c\n", (char) gprmc->latitude.cardinal);
 					}
-
-
-					//navsatfix_pub.publish(navsatfix_msg);
-					//ros::spinOnce();
 
 					nmea_free(data);
 				}

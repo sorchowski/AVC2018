@@ -16,3 +16,7 @@ EXECUTABLE=node_read_gps
 
 $(EXECUTABLE): $(OBJECTS)
 	$(CC) $(OBJECTS) -o $@ -v $(LFLAGS) $(LIBS)
+
+clean:
+	rm -f $(OBJECTS) $(EXECUTABLE)
+
