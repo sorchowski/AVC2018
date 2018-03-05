@@ -1,129 +1,102 @@
 #include <arduino.h>
+#include <SonarArray.h>
 
-  #define MAX_SENSORS 8
+#include <ros.h>
+#include <sensor_msgs/Range.h>
 
-  // kind of backwards the sensors on the board are meant to be used left to right.
-  #define PIN_TRIGGER_1 9
-  #define PIN_TRIGGER_2 8
-  #define PIN_TRIGGER_3 7
-  #define PIN_TRIGGER_4 6
-  #define PIN_TRIGGER_5 5
-  #define PIN_TRIGGER_6 4
-  #define PIN_TRIGGER_7 3
-  #define PIN_TRIGGER_8 2
+#include "ros_topics.h"
+#include "node_names.h"
 
-  #define PIN_ECHO1 10
-  #define PIN_ECHO2 11
+#define NUM_SENSORS 7
 
-  #define TIMEOUT 500000   //in microseconds = 1/2 second
+#define RosPublish false
+#define SerialDebug true
 
-  class SonarSensor {
+ros::NodeHandle nh;
 
-    public:
-      SonarSensor() {}
-      void setPins(int tgrPin, int ePin);
-      long scan();
-      long getDistance() { return distance; }
+//http://docs.ros.org/api/sensor_msgs/html/msg/Range.html
+sensor_msgs::Range range_message;
 
-    private:
-      int triggerPin;
-      int echoPin;
-      long distance;
-  };
+ros::Publisher sonarPublisher(avc_common::ROS_TOPIC_SONAR, &range_message);
 
+Sonar::SonarArray sonarArray(NUM_SENSORS);
 
-  class SonarArray {
-    public:
-      SonarArray(int numberSensors);
-      void scan();
-      long * getDistances();
+unsigned long timer = 0;
 
-    private:
-      SonarSensor sensors[MAX_SENSORS];
-      int numberSensors;
-      long distances[MAX_SENSORS];
-  };
-
-void SonarSensor::setPins(int tgrPin, int ePin) {
-  triggerPin = tgrPin;
-  echoPin = ePin;
-
-  pinMode(triggerPin, OUTPUT);
-  digitalWrite(triggerPin, LOW);
-
-  pinMode(echoPin, INPUT);
-}
-
-long SonarSensor::scan() {
-  long duration;
-  // Pulse the trigger pin
-  digitalWrite(triggerPin, HIGH);
-  delayMicroseconds(10);  // per spec, pulse should be 10us
-  digitalWrite(triggerPin, LOW);
-
-  // TODO: add timeout value for max distance
-  // timeout value is in microseconds, default is 1 second
-  duration = pulseIn(echoPin, HIGH, TIMEOUT);
-
-  // TODO: what do these values mean?
-  distance = (duration/2) / 29.1;
-  return distance;
-}
-
-SonarArray::SonarArray(int numSensors) {
-  numberSensors = numSensors;
-  int triggerAssignments[MAX_SENSORS] = {PIN_TRIGGER_1, PIN_TRIGGER_2, PIN_TRIGGER_3, PIN_TRIGGER_4, PIN_TRIGGER_5, PIN_TRIGGER_6, PIN_TRIGGER_7, PIN_TRIGGER_8};
-  int echoAssignments[MAX_SENSORS] = {PIN_ECHO1, PIN_ECHO1, PIN_ECHO1, PIN_ECHO1, PIN_ECHO2, PIN_ECHO2, PIN_ECHO2, PIN_ECHO2};
-  for (int i=0;i<MAX_SENSORS;i++) {
-    sensors[i].setPins(triggerAssignments[i], echoAssignments[i]);
+void setFrameId(int sensorNum) {
+  switch(sensorNum) {
+    case 1:
+      range_message.header.frame_id = "/sonar1";
+      break;
+    case 2:
+      range_message.header.frame_id = "/sonar2";
+      break;
+    case 3:
+      range_message.header.frame_id = "/sonar3";
+      break;
+    case 4:
+      range_message.header.frame_id = "/sonar4";
+      break;
+    case 5:
+      range_message.header.frame_id = "/sonar5";
+      break;
+    case 6:
+      range_message.header.frame_id = "/sonar6";
+      break;
+    case 7:
+      range_message.header.frame_id = "/sonar7";
+      break;
+    case 8:
+    default:
+      break;
   }
 }
-
-void SonarArray::scan() {
-  for (int i=0;i<numberSensors;i++) {
-    distances[i] = sensors[i].scan();
-  }
-}
-
-long * SonarArray::getDistances() {
-  return distances;
-}
-
-//SonarSensor sonarSensor;
-
-SonarArray sonarArray(5);
 
 void setup() {
-  Serial.begin(115200);
-  //int triggerPin = 9;
-  //pinMode(triggerPin, OUTPUT);
-  //digitalWrite(triggerPin, LOW);
+  if (SerialDebug) {
+    Serial.begin(115200);
+  }
 
-  //sonarSensor.setPins(PIN_TRIGGER_1, PIN_ECHO);
+  if (RosPublish) {
+    range_message.radiation_type = sensor_msgs::Range::ULTRASOUND;
+    // https://cdn.sparkfun.com/datasheets/Sensors/Proximity/HCSR04.pdf
+    range_message.field_of_view = 0.261799; // (in rads) = 15degrees
+    range_message.min_range = 4.0; // (in meters)
+    range_message.max_range = 0.02; // (in meters)
+    // Setup ROS message publisher
+    nh.initNode();
+    nh.advertise(sonarPublisher);
+  }
 }
 
 void loop() {
-  //int triggerPin = 9;
-  //long distance = *distances;
-  //String distStr = String(distance);
-  //String output = "Distance: "+distStr;
-  //Serial.println(output);
-  //delay(2000);
-  //digitalWrite(triggerPin, HIGH);
-  //delay(2000);
-  //digitalWrite(triggerPin, LOW);
 
-  sonarArray.scan();
-  long * distances = sonarArray.getDistances();
-  long d1_distance = distances[0];
-  long d2_distance = distances[1];
-  long d5_distance = distances[4];
+  if ((millis() - timer) > 500) { // twice a second, can we do better?
+    timer = millis();
 
-  String d1ValueStr = String(d1_distance);
-  String d2ValueStr = String(d2_distance);
-  String d5ValueStr = String(d5_distance);
-  String distanceStr = "D1: "+d1ValueStr+", D2: "+d2ValueStr+", D5: "+d5ValueStr;
+    for (int i=1;i<=NUM_SENSORS;i++) {
+      sonarArray.scan(i);
 
-  Serial.println(distanceStr);
-  delay(1000);
+      float distance = sonarArray.getDistance(i);
+      // TODO: convert the distance value?
+      float calculatedDistance = distance;
+
+      if (SerialDebug) {
+        String distanceStr = "D: "+String(calculatedDistance);  
+        Serial.println(distanceStr);
+      }
+
+      if (RosPublish) {
+        range_message.header.stamp = nh.now();
+
+        range_message.range = calculatedDistance;
+        setFrameId(i);
+        sonarPublisher.publish(&range_message);
+        nh.spinOnce();
+      }
+
+      // TODO: determine a good value for below
+      delay(50);
+    }
+  }
 }

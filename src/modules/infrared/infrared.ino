@@ -1,81 +1,88 @@
-/***********************************************************************
+#include <arduino.h>
+#include <ros.h>
+#include <sensor_msgs/Range.h>
 
-"THE BEER-WARE LICENSE"
-As long as you retain this notice you can do whatever you want with this stuff. 
-If we meet some day, and you think this stuff is worth it, you can buy me a beer.
-************************************************************************/
-#include <SoftwareSerial.h>
+#include "ros_topics.h"
+#include "node_names.h"
 
-SoftwareSerial LCD(4,7); // RX, TX
+#define NUM_SENSORS 3
 
-//-------------------------------------------------------------------------------------------
+int analogReadPins[NUM_SENSORS] = {A1, A2, A3};
+
+#define RosPublish false
+#define SerialDebug true
+
+ros::NodeHandle nh;
+
+//http://docs.ros.org/api/sensor_msgs/html/msg/Range.html
+sensor_msgs::Range range_message;
+
+char ir1FrameId[] = "/ir1";
+char ir2FrameId[] = "/ir2";
+char ir3FrameId[] = "/ir3";
+
+ros::Publisher infraredPublisher(avc_common::ROS_TOPIC_INFRARED, &range_message);
+
+unsigned long timer = 0;
+
+void setFrameId(int sensorNum) {
+  switch(sensorNum) {
+    case 1:
+      range_message.header.frame_id = ir1FrameId;
+      break;
+    case 2:
+      range_message.header.frame_id = ir2FrameId;
+      break;
+    case 3:
+      range_message.header.frame_id = ir3FrameId;
+      break;
+    default:
+      range_message.header.frame_id = "irUnknown";
+      break;
+  }
+}
+
 void setup()
 {
-  LCD.begin(9600);// all SerLCDs come at 9600 Baud by default
-  delay(3000);
-  resetDefault();
-  set_16x2();
-  delay(3000);
+  if (SerialDebug) {
+    Serial.begin(115200);
+  }
+
+  if (RosPublish) {
+    range_message.radiation_type = sensor_msgs::Range::INFRARED;
+    range_message.field_of_view = 0.0; // rads, set to zero due to no value given in datasheet
+    range_message.min_range = 1.0; //meters
+    range_message.max_range = 5.5; //meters
+
+    // Setup ROS message publisher
+    nh.initNode();
+    nh.advertise(infraredPublisher);
+  }
 }
-//-------------------------------------------------------------------------------------------
+
 void loop()
 {
-  delay(500);
-  clearScreen();
-  selectLineOne();
-  int infraredReadValue = analogRead(A2);
-  String infraredReadingValueStr = String(infraredReadValue);
-  LCD.print(infraredReadingValueStr);
-}
-//-------------------------------------------------------------------------------------------
-void clearScreen()
-{
-  //clears the screen, you will use this a lot!
-  LCD.write(0xFE);
-  LCD.write(0x01); 
-}
-//-------------------------------------------------------------------------------------------
-void selectLineOne()
-{ 
-  //puts the cursor at line 0 char 0.
-  LCD.write(0xFE); //command flag
-  LCD.write(128); //position
-}
+  if ((millis()-timer) > 100) { // 10 times a second, hopefully
+    timer = millis();
 
-void turnDisplayOn()
-{
-  //this turns the dispaly back ON
-  LCD.write(0xFE); //command flag
-  LCD.write(12); // 0x0C
-}
+    for (int i=1;i<=NUM_SENSORS;i++) {
+      int infraredReadValue = analogRead(analogReadPins[i-1]);
 
-void set_16x2(){//set character LCD as 16x2
-  LCD.write(0x7C); //command flag
-  LCD.write(0x04);     //16 char wide
-  LCD.write(0x7C); //command flag
-  LCD.write(0x06);     //2 lines
-  /*NOTE: Make sure to power cycle the serial enabled LCD 
-  after re-configuring the # char and lines.*/
-}
+      // TODO: convert analog value to distance measurement
+      float calculatedDistance = infraredReadValue;
 
-void resetDefault() {
-  for(int i=0; i<20; i++){ //repeats 20x so that the LCD will catch the reset
-    LCD.write(0x7C);// special command byte => 0d124 or 0x7C
-    LCD.write(0x12);//command to reset the LCD back to 9600
-    /*      HOW TO UNBRICK YOUR LCD
-    1.)remove power from the LCD so that it goes back to the splash screen
-    2.)run the code so that the Arduino runs the resetDefault code
-    3.)the LCD will indicate that it has been reset "Reset to 9600"
-    4.)power cycle LCD to finish reseting the LCD
-    
-    Note: There might be some settings that have the backlight
-     turned down or you need to change the contrast. If this happens
-     just let the code cycle through to turn the brightness back on or
-     adjust the potentiometer
-     
-    If this does not work, the last resort is to try using a Pickit 3 Programmer with
-    the steps listed in the SparkFun "Tech Support Tips/Troubleshooting/Common Issues"
-    [ https://www.sparkfun.com/tutorials/246#comment-563918fb757b7f100d8b4567 ]
-    */
+      if (SerialDebug) {
+        String calculatedDistanceValueStr = String(calculatedDistance);
+        Serial.println(calculatedDistanceValueStr);
+      }
+
+      if (RosPublish) {
+        range_message.header.stamp = nh.now();
+        range_message.range = calculatedDistance;
+        setFrameId(i);
+        infraredPublisher.publish(&range_message);
+        nh.spinOnce();
+      }
+    }
   }
 }

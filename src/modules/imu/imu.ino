@@ -5,12 +5,13 @@
 #include <sensor_msgs/MagneticField.h>
 
 #include "ros_topics.h"
+#include "node_names.h"
 #include "quaternionFilters.h"
 #include "MPU9250.h"
 
 // Generally, one or the other should be true while the other false; not true at the same time.
-#define SerialDebug false // Set to true to get Serial output for debugging
-#define RosPublish true   // Set to true if calling ROS publish functionality
+#define SerialDebug true // Set to true to get Serial output for debugging
+#define RosPublish false   // Set to true if calling ROS publish functionality
 
 #define GS_PER_METSECSQ 0.10197162129779
 
@@ -20,6 +21,9 @@ ros::NodeHandle nh;
 
 sensor_msgs::Imu imu_message;
 sensor_msgs::MagneticField  mag_message;
+
+char magFrameId = "/mag";
+char imuFrameId = "/imu";
 
 ros::Publisher imuPublisher(avc_common::ROS_TOPIC_IMU, &imu_message);
 ros::Publisher magPublisher(avc_common::ROS_TOPIC_MAG, &mag_message);
@@ -31,6 +35,7 @@ void setup()
 
   if (SerialDebug) {
     Serial.begin(38400);
+    Serial.println("hello");
   }
 
   // Read the WHO_AM_I register, this is a good test of communication
@@ -171,6 +176,9 @@ void loop()
   // update based on the following rate
   if (myIMU.delt_t > 500) // every half-second
   {
+    imu_message.header.stamp = nh.now();
+    mag_message.header.stamp = nh.now();
+
     myIMU.tempCount = myIMU.readTempData();  // Read the adc values
     // Temperature in degrees Centigrade
     myIMU.temperature = ((float) myIMU.tempCount) / 333.87 + 21.0;
@@ -214,6 +222,10 @@ void loop()
     imu_message.orientation.w = *(getQ());
 
     if (RosPublish) {
+      imu_message.header.stamp = nh.now();
+      imu_message.header.frame_id = imuFrameId;
+      mag_message.header.stamp = nh.now();
+      mag_message.header.frame_id = magFrameId;
       imuPublisher.publish(&imu_message);
       magPublisher.publish(&mag_message);
       nh.spinOnce();
