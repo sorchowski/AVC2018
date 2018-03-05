@@ -21,3 +21,5 @@ mv /c/Users/steve/Documents/Arduino/libraries/ros_lib/src/library.properties /c/
 
 mkdir -p /c/Users/steve/Documents/Arduino/libraries/avc_common/
 cp common/ros_topics.h /c/Users/steve/Documents/Arduino/libraries/avc_common/
+cp common/node_names.h /c/Users/steve/Documents/Arduino/libraries/avc_common/
+
