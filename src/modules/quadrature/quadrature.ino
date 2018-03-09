@@ -7,8 +7,8 @@
 #include "ros_topics.h"
 #include "node_names.h"
 
-#define RosPublish false
-#define SerialDebug true
+#define RosPublish true
+#define SerialDebug false
 
 #define ENCODER1_SS 10
 #define ENCODER2_SS 11
