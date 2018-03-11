@@ -1,6 +1,6 @@
 
 CC=g++
-LIBS=-lroscpp -lrosconsole -lrostime
+LIBS=-lroscpp -lrosconsole -lrostime -lroscpp_serialization
 LFLAGS=-L/opt/ros/kinetic/lib
 #SHARED==Wl,-rpath,/opt/ros/kinetic/lib
 INCLUDES=-I../../../lib/common -I/opt/ros/kinetic/include
