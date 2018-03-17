@@ -151,10 +151,12 @@ int main(int argc, char **argv)
 	ros::Subscriber gpsSub = nh.subscribe(avc_common::ROS_TOPIC_GPS, 1000, gpsCallback);
 	ros::Subscriber magSub = nh.subscribe(avc_common::ROS_TOPIC_MAG, 1000, magCallback);
 
+	ros::Rate loop_rate(2);
+
 	while(ros::ok()) {
-		//ros::spin();
-		// TODO: print data values if timer ok
 		ros::spinOnce();
+		loop_rate.sleep();
+		printData();
 	}
 
 	return 0;
