@@ -12,7 +12,6 @@ else
 fi
 
 echo "target ros workspace:" $ROS_WORKSPACE_HOME
-# under <ros workspace>/src/, enter "catkin_create_pkg avc"
 
 if [ ! -d "$ROS_WORKSPACE_HOME/src" ]; then
     echo "$ROS_WORKSPACE_HOME/src does not exist";
