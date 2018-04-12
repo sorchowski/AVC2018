@@ -23,21 +23,24 @@ fi
 if [ ! -d "$ROS_WORKSPACE_HOME/src/$ROS_AVC_PROJECT_NAME" ]; then
     echo 'avc package does not exist, creating'
     cd $ROS_WORKSPACE_HOME/src/
-    catkin_create_pkg $ROS_AVC_PROEJCT_NAME
+    catkin_create_pkg $ROS_AVC_PROJECT_NAME
     mkdir -p $ROS_WORKSPACE_HOME/src/$ROS_AVC_PROJECT_NAME/include
     mkdir -p $ROS_WORKSPACE_HOME/src/$ROS_AVC_PROJECT_NAME/src
     cd -
 fi
 
 #copy CMakeLists.txt and package.xml to <ros workspace/src/avc/
+echo 'Copying ros make files'
 cp CMakeLists.txt $ROS_WORKSPACE_HOME/src/$ROS_AVC_PROJECT_NAME/
 cp package.xml $ROS_WORKSPACE_HOME/src/$ROS_AVC_PROJECT_NAME/
 
-#copy node_read_gps.cpp to <ros_workspace>/src/avc/src
+#copy our own modules to <ros_workspace>/src/avc/src
+echo 'Copying avc source files'
 cp ../modules/gps/node_read_gps.cpp $ROS_WORKSPACE_HOME/src/$ROS_AVC_PROJECT_NAME/src
+cp ../modules/display/display.cpp $ROS_WORKSPACE_HOME/src/$ROS_AVC_PROJECT_NAME/src
 
 #copy AVC/lib/common/*.* to <ros_workspace>/src/avc/include
-cp ../../lib/common/ $ROS_WORKSPACE_HOME/src/$ROS_AVC_PROJECT_NAME/include
+cp ../../lib/common/*.* $ROS_WORKSPACE_HOME/src/$ROS_AVC_PROJECT_NAME/include
 
 #in top-level ros workspace directory, enter "catkin_make"
 echo "Go to $ROS_WORKSPACE_HOME/src/, and enter 'catkin_make'"

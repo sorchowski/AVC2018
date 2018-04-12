@@ -46,7 +46,7 @@ struct avc_data_t {
 
 void sonarCallback(const sensor_msgs::Range::ConstPtr& range_message)
 {
-	sonar_count += 1;
+	avc_data.sonar_count += 1;
 
 	const char * frame_id = range_message->header.frame_id.c_str();
 
@@ -69,14 +69,14 @@ void sonarCallback(const sensor_msgs::Range::ConstPtr& range_message)
 
 void odometerCallback(const geometry_msgs::TwistStamped::ConstPtr& odom_message)
 {
-	velocity_count += 1;
+	avc_data.velocity_count += 1;
 
 	avc_data.velocity = odom_message->twist.linear.x;
 }
 
 void imuCallback(const sensor_msgs::Imu::ConstPtr& imu_message)
 {
-	imu_count += 1;
+	avc_data.imu_count += 1;
 
 	avc_data.imu_acc_x = imu_message->linear_acceleration.x;
 	avc_data.imu_acc_y = imu_message->linear_acceleration.y;
@@ -88,7 +88,7 @@ void imuCallback(const sensor_msgs::Imu::ConstPtr& imu_message)
 
 void irCallback(const sensor_msgs::Range::ConstPtr& range_message)
 {
-	ir_count += 1;
+	avc_data.ir_count += 1;
 
 	const char * frame_id = range_message->header.frame_id.c_str();
 
@@ -103,7 +103,7 @@ void irCallback(const sensor_msgs::Range::ConstPtr& range_message)
 
 void gpsCallback(const sensor_msgs::NavSatFix::ConstPtr& navsatfix_msg)
 {
-	gps_count += 1;
+	avc_data.gps_count += 1;
 
 	avc_data.latitude = navsatfix_msg->latitude;
 	avc_data.longitude = navsatfix_msg->longitude;
@@ -112,7 +112,7 @@ void gpsCallback(const sensor_msgs::NavSatFix::ConstPtr& navsatfix_msg)
 
 void magCallback(const sensor_msgs::MagneticField::ConstPtr& mag_message)
 {
-	mag_count += 1;
+	avc_data.mag_count += 1;
 
 	avc_data.mag_x = mag_message->magnetic_field.x;
 	avc_data.mag_y = mag_message->magnetic_field.y;
