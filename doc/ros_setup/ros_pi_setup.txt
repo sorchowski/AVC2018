@@ -1,0 +1,33 @@
+First, update your distro
+
+	$ sudo apt-get update
+	$ sudo apt-get upgrade
+
+For the "Kinetic" distro, follow the instructions here: 
+
+	http://wiki.ros.org/kinetic/Installation/Ubuntu
+
+If not already done as part of the kinetic install instructions, add "source /opt/ros/kinetic/setup.bash"
+to your .bashrc file.
+
+If necessary, install extra packages:
+
+	$ sudo apt-get install -y python-rosdep python-rosinstall-generator python-wstool python-rosinstall build-essential cmake
+
+
+Create a ros workspace for building the AVC ros pacakges.
+
+	$ mkdir -p ~/ros_catkin_ws
+	$ cd ~/ros_catkin_ws
+	$ catkin_make
+	$ source devel/setup.bash
+
+	Be sure to add "source ~/ros_catkin_ws/develop/setup.bash to .bashrc
+	It is ok to have your environment source the workspace after already
+	sourcing the kinetic installation; otherwise, ros won't be able to
+	find avc packages that need to be built.
+
+Go to src/ros_package, and run setup.sh. This will copy the necessary avc files to the ros workspace.
+
+Build the AVC ros packages. Go to your ros workspace home, and enter 'catkin_make'.
+

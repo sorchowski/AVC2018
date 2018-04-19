@@ -1,0 +1,7 @@
+<launch>
+    <node name="node_odometry" pkg="rosserial_python" type="serial_node.py" args="/dev/rosnode_nano" respawn="true" />
+    <node name="node_imu" pkg="rosserial_python" type="serial_node.py" args="/dev/rosnode_ardzero" respawn="true" />
+    <!--node name="node_sonar" pkg="rosserial_python" type="serial_node.py" args="/dev/rosnode_sonar" respawn="true" /-->
+    <!--node name="node_infrared" pkg="rosserial_python" type="serial_node.py" args="/dev/rosnode_nano???" respawn="true" /-->
+    <!--node name="node_gps" pkg="">
+</launch>

@@ -1,1 +1,1 @@
-This directory holds test sketches for evaluating various components or products.
+This directory holds test sketches and programs for evaluating various components or products.
