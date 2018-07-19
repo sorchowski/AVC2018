@@ -52,6 +52,7 @@ cp avc.launch $ROS_WORKSPACE_HOME/src/$ROS_AVC_PROJECT_NAME/
 echo 'Copying avc source files'
 cp ../modules/gps/node_read_gps.cpp $ROS_WORKSPACE_HOME/src/$ROS_AVC_PROJECT_NAME/src
 cp ../modules/display/display.cpp $ROS_WORKSPACE_HOME/src/$ROS_AVC_PROJECT_NAME/src
+cp ../modules/quadrature/node_quad_convert.cpp $ROS_WORKSPACE_HOME/src/$ROS_AVC_PROJECT_NAME/src
 
 #copy AVC/lib/common/*.* to <ros_workspace>/src/avc/include
 cp ../../lib/common/*.* $ROS_WORKSPACE_HOME/src/$ROS_AVC_PROJECT_NAME/include

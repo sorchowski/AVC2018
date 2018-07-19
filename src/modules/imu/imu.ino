@@ -22,8 +22,8 @@ ros::NodeHandle nh;
 sensor_msgs::Imu imu_message;
 sensor_msgs::MagneticField  mag_message;
 
-char magFrameId = "/mag";
-char imuFrameId = "/imu";
+char magFrameId = "mag";
+char imuFrameId = "imu";
 
 ros::Publisher imuPublisher(avc_common::ROS_TOPIC_IMU, &imu_message);
 ros::Publisher magPublisher(avc_common::ROS_TOPIC_MAG, &mag_message);

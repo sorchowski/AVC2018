@@ -10,12 +10,16 @@
 #define RosPublish true
 #define SerialDebug false
 
-#define ENCODER1_SS 10
+#define ENCODER1_SS 5
 #define ENCODER2_SS 11
+
+#define SAMPLE_RATE 100
+
+// 4.25 inches in meters
+#define WHEEL_DIAMETER 0.10795
 
 ros::NodeHandle nh;
 geometry_msgs::TwistStamped odom_message;
-char odometerFrameId[] = "/odometer";
 
 ros::Publisher odoPub(avc_common::ROS_TOPIC_ODOMETRY, &odom_message);
 
@@ -28,6 +32,8 @@ QuadratureEncoder encoder1(ENCODER1_SS, MDR0_CONFIG, MDR1_CONFIG);
 QuadratureEncoder encoder2(ENCODER2_SS, MDR0_CONFIG, MDR1_CONFIG);
 
 unsigned long timer = 0;
+unsigned long last_count1 = 0;
+unsigned long last_count2 = 0;
 
 void setup(){
   if (SerialDebug) {
@@ -38,7 +44,7 @@ void setup(){
   pinMode(ENCODER2_SS, OUTPUT);
   SPI.begin();
   encoder1.init();
-  //encoder2.init();
+  encoder2.init();
 
   if (RosPublish) {
     // Setup ROS message publisher
@@ -48,30 +54,48 @@ void setup(){
 }
 
 void loop() {
-  if ((millis() - timer) > 100) { // 10 times a second, hopefully
+  if ((millis() - timer) > SAMPLE_RATE) { // 10 times a second
     timer = millis();
 
-    long count1 = encoder1.count();
+    unsigned long count1 = encoder1.count();
     byte status1 = encoder1.status();
 
-    //long count2 = encoder2.count();
-    //byte status2 = encoder2.status();
+    unsigned long count2 = encoder2.count();
+    byte status2 = encoder2.status();
 
-    // TODO: convert "count" to distance measurement
-    // Do some math to convert tick count to revolutions of wheel
+    signed long signed_diff1 = count1-last_count1;
+    unsigned long ticks1 = abs(signed_diff1);
+    signed long signed_diff2 = count2-last_count2;
+    unsigned long ticks2 = abs(signed_diff2);
+
+    bool forward = (signed_diff1 < 0) ? false : true;
+    // Consider obtaining direction from status byte. Note, testing revealed this
+    // did not always seem to be reliable.
+    float velocity1 = (((float)ticks1)*(M_PI*WHEEL_DIAMETER))/20.0;
+    float velocity2 = (((float)ticks2)*(M_PI*WHEEL_DIAMETER))/20.0;
+
+    // Convert from velocity/100ms to velocity/s
+    velocity1 = velocity1*10;
+    velocity2 = velocity2*10;
+
     // Average the wheel rotations between right and left.
+    float velocity = (velocity1+velocity2)/2; // in m/s
 
-    float velocity = 1.234; // m/s
+    last_count1=count1;
+    last_count2=count2;
 
     if (SerialDebug) {
       String debugMsgStr = "Count: "+String(count1)+", status: "+String(status1);
       Serial.println(debugMsgStr);
+      String debugString2 = "V: "+String(velocity);
+      Serial.println(debugString2);
     }
 
     if (RosPublish) {
       odom_message.header.stamp = nh.now();
-      odom_message.header.frame_id = odometerFrameId;
-      odom_message.twist.linear.x = velocity; // TODO: decide whether this should be x,y,or z
+      odom_message.header.frame_id = "odom";
+      //odom_message.child_frame_id = "base_link";
+      odom_message.twist.linear.x = velocity;
       odoPub.publish(&odom_message);
       nh.spinOnce();
     }
