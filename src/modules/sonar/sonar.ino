@@ -9,8 +9,14 @@
 
 #define NUM_SENSORS 7
 
-#define RosPublish false
-#define SerialDebug true
+#define RosPublish true
+#define SerialDebug false
+
+// Every 60 milliseconds per HCSR04 documented recommendation
+#define SAMPLE_RATE 60
+
+#define MAX_RANGE 4.0
+#define MIN_RANGE 0.02
 
 ros::NodeHandle nh;
 
@@ -23,28 +29,31 @@ Sonar::SonarArray sonarArray(NUM_SENSORS);
 
 unsigned long timer = 0;
 
+// Sensor numbers are 1-based
+unsigned int current_sensor_num = 1;
+
 void setFrameId(int sensorNum) {
   switch(sensorNum) {
     case 1:
-      range_message.header.frame_id = "/sonar1";
+      range_message.header.frame_id = "1";
       break;
     case 2:
-      range_message.header.frame_id = "/sonar2";
+      range_message.header.frame_id = "2";
       break;
     case 3:
-      range_message.header.frame_id = "/sonar3";
+      range_message.header.frame_id = "3";
       break;
     case 4:
-      range_message.header.frame_id = "/sonar4";
+      range_message.header.frame_id = "4";
       break;
     case 5:
-      range_message.header.frame_id = "/sonar5";
+      range_message.header.frame_id = "5";
       break;
     case 6:
-      range_message.header.frame_id = "/sonar6";
+      range_message.header.frame_id = "6";
       break;
     case 7:
-      range_message.header.frame_id = "/sonar7";
+      range_message.header.frame_id = "7";
       break;
     case 8:
     default:
@@ -61,8 +70,8 @@ void setup() {
     range_message.radiation_type = sensor_msgs::Range::ULTRASOUND;
     // https://cdn.sparkfun.com/datasheets/Sensors/Proximity/HCSR04.pdf
     range_message.field_of_view = 0.261799; // (in rads) = 15degrees
-    range_message.min_range = 4.0; // (in meters)
-    range_message.max_range = 0.02; // (in meters)
+    range_message.min_range = MIN_RANGE; // (in meters)
+    range_message.max_range = MAX_RANGE; // (in meters)
     // Setup ROS message publisher
     nh.initNode();
     nh.advertise(sonarPublisher);
@@ -71,32 +80,36 @@ void setup() {
 
 void loop() {
 
-  if ((millis() - timer) > 500) { // twice a second, can we do better?
+  if ((millis() - timer) > SAMPLE_RATE) {
     timer = millis();
 
-    for (int i=1;i<=NUM_SENSORS;i++) {
-      sonarArray.scan(i);
+    sonarArray.scan(current_sensor_num);
 
-      float distance = sonarArray.getDistance(i);
-      // TODO: convert the distance value?
-      float calculatedDistance = distance;
+    float distance = sonarArray.getDistance(current_sensor_num);
+    // The distance value is in cm. We need to convert it to meters per ROS conventions.
 
-      if (SerialDebug) {
-        String distanceStr = "D: "+String(calculatedDistance);  
-        Serial.println(distanceStr);
-      }
+    float calculatedDistance = distance/100.0;
 
-      if (RosPublish) {
+    if (SerialDebug) {
+      String distanceStr = String(current_sensor_num)+": "+String(calculatedDistance);
+      Serial.println(distanceStr);
+    }
+
+    if (RosPublish) {
+      // Do not publish a range message if the calculated distance is outside of the max/min of the sonar sensor.
+      if (calculatedDistance<MAX_RANGE || calculatedDistance>MIN_RANGE) {
         range_message.header.stamp = nh.now();
-
         range_message.range = calculatedDistance;
-        setFrameId(i);
+        setFrameId(current_sensor_num);
         sonarPublisher.publish(&range_message);
         nh.spinOnce();
       }
+    }
 
-      // TODO: determine a good value for below
-      delay(50);
+    current_sensor_num++;
+
+    if (current_sensor_num > NUM_SENSORS) {
+      current_sensor_num = 1;
     }
   }
 }

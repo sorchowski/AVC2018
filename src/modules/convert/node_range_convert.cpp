@@ -4,6 +4,8 @@
 #include "ros_topics.h"
 #include "node_names.h"
 
+#define SAMPLE_RATE 100
+
 /**
  * The purpose of this class is to merge range messages from Infrared and Sonar sensors into a single
  * point-cloud message for processing by the ros navigation stack.
@@ -44,13 +46,13 @@ class RangeConverter {
 
 int main(int argc, char **argv)
 {
-  ros::init(argc, argv, avc_common::NODE_NAME_CONVERT_QUADRATURE);
+  ros::init(argc, argv, avc_common::NODE_NAME_CONVERT_RANGE);
 
   RangeConverter rangeConverter;
 
   //TODO test both of these
   //ros::spin();
-  while(true) { ros::Rate(100).sleep(); ros::spinOnce(); }
+  while(true) { ros::Rate(SAMPLE_RATE).sleep(); ros::spinOnce(); }
 
   return 0;
 }

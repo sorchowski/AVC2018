@@ -1,3 +1,5 @@
+#!/bin/sh
+
 mkdir -p /c/Users/steve/Documents/Arduino/libraries/LS7366
 cp ArduinoLibs/LS7366/LS7366/LS7366R.cpp /c/Users/steve/Documents/Arduino/libraries/LS7366/
 cp ArduinoLibs/LS7366/LS7366/LS7366R.h /c/Users/steve/Documents/Arduino/libraries/LS7366/

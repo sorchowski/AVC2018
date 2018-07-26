@@ -5,6 +5,8 @@
 #include "ros_topics.h"
 #include "node_names.h"
 
+#define SAMPLE_RATE 100
+
 class QuadratureConverter {
 
   public:
@@ -45,7 +47,7 @@ int main(int argc, char **argv)
 
   //TODO test both of these
   //ros::spin();
-  while(true) { ros::Rate(100).sleep(); ros::spinOnce(); }
+  while(true) { ros::Rate(SAMPLE_RATE).sleep(); ros::spinOnce(); }
 
   return 0;
 }

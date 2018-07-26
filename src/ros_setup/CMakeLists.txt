@@ -60,7 +60,8 @@ include_directories(
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
 add_executable(avc_gps_node src/node_read_gps.cpp)
-add_executable(avc_quadrature_convert src/node_quad_convery.cpp)
+add_executable(avc_quadrature_convert src/node_quad_convert.cpp)
+add_executable(avc_range_convert src/node_range_convert.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -74,6 +75,8 @@ add_executable(avc_quadrature_convert src/node_quad_convery.cpp)
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(avc_gps_node nmea ${catkin_LIBRARIES})
+target_link_libraries(avc_quadrature_convert ${catkin_LIBRARIES})
+target_link_libraries(avc_range_convert ${catkin_LIBRARIES})
 
 #############
 ## Install ##

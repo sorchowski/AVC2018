@@ -13,6 +13,7 @@
 #define ENCODER1_SS 5
 #define ENCODER2_SS 11
 
+// 10 times a second
 #define SAMPLE_RATE 100
 
 // 4.25 inches in meters
@@ -54,7 +55,7 @@ void setup(){
 }
 
 void loop() {
-  if ((millis() - timer) > SAMPLE_RATE) { // 10 times a second
+  if ((millis() - timer) > SAMPLE_RATE) {
     timer = millis();
 
     unsigned long count1 = encoder1.count();

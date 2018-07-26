@@ -10,10 +10,13 @@
 #include "MPU9250.h"
 
 // Generally, one or the other should be true while the other false; not true at the same time.
-#define SerialDebug true // Set to true to get Serial output for debugging
-#define RosPublish false   // Set to true if calling ROS publish functionality
+#define SerialDebug false // Set to true to get Serial output for debugging
+#define RosPublish true   // Set to true if calling ROS publish functionality
 
 #define GS_PER_METSECSQ 0.10197162129779
+
+// 10 times per second
+#define SAMPLE_RATE 100
 
 MPU9250 myIMU;
 
@@ -22,8 +25,8 @@ ros::NodeHandle nh;
 sensor_msgs::Imu imu_message;
 sensor_msgs::MagneticField  mag_message;
 
-char magFrameId = "mag";
-char imuFrameId = "imu";
+const char magFrameId[] = "mag";
+const char imuFrameId[] = "imu";
 
 ros::Publisher imuPublisher(avc_common::ROS_TOPIC_IMU, &imu_message);
 ros::Publisher magPublisher(avc_common::ROS_TOPIC_MAG, &mag_message);
@@ -174,7 +177,7 @@ void loop()
   myIMU.delt_t = millis() - myIMU.count;
 
   // update based on the following rate
-  if (myIMU.delt_t > 500) // every half-second
+  if (myIMU.delt_t > SAMPLE_RATE)
   {
     imu_message.header.stamp = nh.now();
     mag_message.header.stamp = nh.now();
