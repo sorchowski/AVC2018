@@ -1,17 +1,10 @@
 // MPU9250-specific code is from https://github.com/sparkfun/MPU-9250_Breakout
 
-#include <ros.h>
-#include <sensor_msgs/Imu.h>
-#include <sensor_msgs/MagneticField.h>
-
-#include "ros_topics.h"
-#include "node_names.h"
 #include "quaternionFilters.h"
 #include "MPU9250.h"
 
 // Generally, one or the other should be true while the other false; not true at the same time.
 #define SerialDebug false // Set to true to get Serial output for debugging
-#define RosPublish true   // Set to true if calling ROS publish functionality
 
 #define GS_PER_METSECSQ 0.10197162129779
 
@@ -20,24 +13,17 @@
 
 MPU9250 myIMU;
 
-ros::NodeHandle nh;
-
-sensor_msgs::Imu imu_message;
-sensor_msgs::MagneticField  mag_message;
-
-const char magFrameId[] = "mag";
-const char imuFrameId[] = "imu";
-
-ros::Publisher imuPublisher(avc_common::ROS_TOPIC_IMU, &imu_message);
-ros::Publisher magPublisher(avc_common::ROS_TOPIC_MAG, &mag_message);
+//ros::Publisher imuPublisher(avc_common::ROS_TOPIC_IMU, &imu_message);
+//ros::Publisher magPublisher(avc_common::ROS_TOPIC_MAG, &mag_message);
 
 void setup()
 {
   Wire.begin();
   // TWBR = 12;  // 400 kbit/sec I2C speed
 
+  Serial.begin(57600);
+
   if (SerialDebug) {
-    Serial.begin(38400);
     Serial.println("hello");
   }
 
@@ -98,13 +84,6 @@ void setup()
       Serial.println(myIMU.magCalibration[1], 2);
       Serial.print("Z-Axis sensitivity adjustment value ");
       Serial.println(myIMU.magCalibration[2], 2);
-    }
-
-    if (RosPublish) {
-      // Setup ROS message publisher
-      nh.initNode();
-      nh.advertise(imuPublisher);
-      nh.advertise(magPublisher);
     }
 
   } // if (c == 0x71)
@@ -179,60 +158,51 @@ void loop()
   // update based on the following rate
   if (myIMU.delt_t > SAMPLE_RATE)
   {
-    imu_message.header.stamp = nh.now();
-    mag_message.header.stamp = nh.now();
-
     myIMU.tempCount = myIMU.readTempData();  // Read the adc values
     // Temperature in degrees Centigrade
     myIMU.temperature = ((float) myIMU.tempCount) / 333.87 + 21.0;
 
     // in Gs. need to convert to meters/sec^2 for ros message
-    float ax = myIMU.ax*GS_PER_METSECSQ;
-    float ay = myIMU.ay*GS_PER_METSECSQ;
-    float az = myIMU.az*GS_PER_METSECSQ;
-
-    imu_message.linear_acceleration.x = ax;
-    imu_message.linear_acceleration.y = ay;
-    imu_message.linear_acceleration.z = az;
-    imu_message.linear_acceleration_covariance[0] = -1;
+    float linear_acceleration_x = myIMU.ax*GS_PER_METSECSQ;
+    float linear_acceleration_y = myIMU.ay*GS_PER_METSECSQ;
+    float linear_acceleration_z = myIMU.az*GS_PER_METSECSQ;
+    //float linear_acceleration_covariance[0] = -1;
 
     // deg/s. need to convert to radians for ros message
-    float gx = myIMU.gx*DEG_TO_RAD;
-    float gy = myIMU.gy*DEG_TO_RAD;
-    float gz = myIMU.gz*DEG_TO_RAD;
-
-    imu_message.angular_velocity.x = gx;
-    imu_message.angular_velocity.y = gy;
-    imu_message.angular_velocity.z = gz;
-    imu_message.angular_velocity_covariance[0] = -1;
+    float angular_velocity_x = myIMU.gx*DEG_TO_RAD;
+    float angular_velocity_y = myIMU.gy*DEG_TO_RAD;
+    float angular_velocity_z = myIMU.gz*DEG_TO_RAD;
+    //float angular_velocity_covariance = -1;
 
     // in mG
     float mx = myIMU.mx;
     float my = myIMU.my;
     float mz = myIMU.mz;
-    mag_message.magnetic_field.x = mx;
-    mag_message.magnetic_field.y = my;
-    mag_message.magnetic_field.z = mz;
 
     // q0: *getQ()
     // qx: *(getQ() + 1);
     // qy: *(getQ() + 2);
     // qz: *(getQ() + 3);
 
-    imu_message.orientation.x = *(getQ() + 1);
-    imu_message.orientation.y = *(getQ() + 2);
-    imu_message.orientation.z = *(getQ() + 3);
-    imu_message.orientation.w = *(getQ());
+    float orientation_x = *(getQ() + 1);
+    float orientation_y = *(getQ() + 2);
+    float orientation_z = *(getQ() + 3);
+    float orientation_w = *(getQ());
 
-    if (RosPublish) {
-      imu_message.header.stamp = nh.now();
-      imu_message.header.frame_id = imuFrameId;
-      mag_message.header.stamp = nh.now();
-      mag_message.header.frame_id = magFrameId;
-      imuPublisher.publish(&imu_message);
-      magPublisher.publish(&mag_message);
-      nh.spinOnce();
-    }
+    String lin_acc_x = String(linear_acceleration_x);
+    String lin_acc_y = String(linear_acceleration_y);
+    String lin_acc_z = String(linear_acceleration_z);
+
+    String ang_vel_x = String(angular_velocity_x);
+    String ang_vel_y = String(angular_velocity_y);
+    String ang_vel_z = String(angular_velocity_z);
+
+    String orient_x = String(orientation_x);
+    String orient_y = String(orientation_y);
+    String orient_z = String(orientation_z);
+    String orient_w = String(orientation_w);
+
+    Serial.print(lin_acc_x+","+lin_acc_y+","+lin_acc_z+","+ang_vel_x+","+ang_vel_y+","+ang_vel_z+","+orient_x+","+orient_y+","+orient_z+","+orient_w);
 
     /*
     myIMU.yaw   = atan2(2.0f * (*(getQ()+1) * *(getQ()+2) + *getQ() *
