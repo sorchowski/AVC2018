@@ -9,12 +9,13 @@
 #include <stdlib.h>
 #include <time.h>
 
-#include <ros.h>
+#include <ros/ros.h>
 #include <sensor_msgs/Imu.h>
 #include <sensor_msgs/MagneticField.h>
 
 #include "ros_topics.h"
 #include "node_names.h"
+#include "device_paths.h"
 
 //ros::NodeHandle nh;
 
@@ -29,9 +30,6 @@ const char imuFrameId[] = "imu";
 
 struct termios tty;
 struct termios tty_old;
-
-// Will contain parsed gps data
-nmea_s * data;
 
 int configure_usb(int ser_fd) {
 	if (tcgetattr(ser_fd, &tty) != 0) {
@@ -70,7 +68,7 @@ int configure_usb(int ser_fd) {
 int main(int argc, char **argv) {
 
 	// Setup the device path
-	char * real_path = realpath(avc_common::ROS_NODE_DEVICE_PATH_GPS, NULL);
+	char * real_path = realpath(avc_common::ROS_NODE_DEVICE_PATH_IMU, NULL);
 	if (real_path != NULL) {
 		printf("real path returned: %s\n", real_path);
 	}
