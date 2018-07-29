@@ -175,7 +175,7 @@ int main(int argc, char **argv) {
 						navsatfix_msg.altitude = gpgga->altitude; // Currently in meters
 	
 						navsatfix_pub.publish(navsatfix_msg);
-                                        	ros::spinOnce();
+                        ros::spinOnce();
 					}
 
 					if (NMEA_GPGLL == data->type) {

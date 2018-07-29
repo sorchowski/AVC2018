@@ -8,6 +8,10 @@
 #include <cstdio>
 #include <stdlib.h>
 #include <time.h>
+#include <iostream>
+#include <string>
+#include <sstream>
+#include <vector>
 
 #include <ros/ros.h>
 #include <sensor_msgs/Imu.h>
@@ -17,12 +21,6 @@
 #include "node_names.h"
 #include "device_paths.h"
 
-//ros::NodeHandle nh;
-
-//sensor_msgs::Imu imu_message;
-//sensor_msgs::MagneticField  mag_message;
-
-const char magFrameId[] = "mag";
 const char imuFrameId[] = "imu";
 
 // Way overkill, but meh...
@@ -85,6 +83,11 @@ int main(int argc, char **argv) {
 		std::exit(1);
 	}
 
+	// Initialize ROS stuff
+	ros::init(argc, argv, avc_common::NODE_NAME_IMU);
+	ros::NodeHandle nh;
+	ros::Publisher imu_pub = nh.advertise<sensor_msgs::Imu>("imu", 1000);
+
 	// Initialize the serial connection to the GPS device with correct read settings
 	configure_usb(usb_fd);
 
@@ -92,41 +95,55 @@ int main(int argc, char **argv) {
 
 	while (ros::ok()) {
 		int n = read(usb_fd, buffer, sizeof(buffer));
-		if (n > 0) {
-			//printf("%.*s",n, buffer);
+
+		// sometimes the buffer contains only a newline
+		if (n > 1) {
 			buffer[n] = 0;
-			printf("buffer string: %s",buffer);
+			//printf("buffer string: %s",buffer);
 
-//    imu_message.header.stamp = nh.now();
-//    mag_message.header.stamp = nh.now();
+			// Example buffer string contents:
+			// buffer string: -0.012193,-0.012547,0.089287,0.000266,0.002264,-0.000799,-0.072839,0.063523,0.052157,0.993951
 
-      // Setup ROS message publisher
-//      nh.initNode();
-//      nh.advertise(imuPublisher);
-//      nh.advertise(magPublisher);
+	        std::string word;
+    	    std::stringstream stream(buffer);
+        	std::vector<std::string> imu_data(10);
+        	while( std::getline(stream, word, ',') ) {
+                imu_data.push_back(word);
+        	}
 
-//    imu_message.orientation.x = *(getQ() + 1);
-//    imu_message.orientation.y = *(getQ() + 2);
-//    imu_message.orientation.z = *(getQ() + 3);
-//    imu_message.orientation.w = *(getQ());
+			// order of imu data is thus:
+			// lin_acc_x
+			// lin_acc_y
+			// lin_acc_z
+			// ang_vel_x
+			// ang_vel_y
+			// ang_vel_z
+			// orient_x
+			// orient_y
+			// orient_z
+			// orient_w
 
-//    imu_message.linear_acceleration.x = ax;
-//    imu_message.linear_acceleration.y = ay;
-//    imu_message.linear_acceleration.z = az;
-//    imu_message.linear_acceleration_covariance[0] = -1;
+			sensor_msgs::Imu imu_msg;
+		    imu_msg.header.stamp = nh.now();
+			imu_msg.header.frame_id = imuFrameId;
 
-//    imu_message.angular_velocity.x = gx;
-//    imu_message.angular_velocity.y = gy;
-//    imu_message.angular_velocity.z = gz;
-//    imu_message.angular_velocity_covariance[0] = -1;
+		    imu_msg.linear_acceleration.x = imu_data[0]; //ax;
+		    imu_msg.linear_acceleration.y = imu_data[1]; //ay;
+	    	imu_msg.linear_acceleration.z = imu_data[2]; //az;
+    		imu_msg.linear_acceleration_covariance[0] = -1;
 
-//      imu_message.header.stamp = nh.now();
-//      imu_message.header.frame_id = imuFrameId;
-//      mag_message.header.stamp = nh.now();
-//      mag_message.header.frame_id = magFrameId;
-//      imuPublisher.publish(&imu_message);
-//      magPublisher.publish(&mag_message);
-//      nh.spinOnce();
+    		imu_msg.angular_velocity.x = imu_data[3]; //gx;
+    		imu_msg.angular_velocity.y = imu_data[4]; //gy;
+    		imu_msg.angular_velocity.z = imu_data[5]; //gz;
+    		imu_msg.angular_velocity_covariance[0] = -1;
+
+    		imu_msg.orientation.x = imu_data[6]; //*(getQ() + 1);
+    		imu_msg.orientation.y = imu_data[7]; //*(getQ() + 2);
+    		imu_msg.orientation.z = imu_data[8]; //*(getQ() + 3);
+    		imu_msg.orientation.w = imu_data[9]; //*(getQ());
+
+			imu_pub.publish(imu_msg);
+            ros::spinOnce();
         }
     }
 }

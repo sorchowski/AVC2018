@@ -6,7 +6,7 @@
 #include "ros_topics.h"
 #include "node_names.h"
 
-#define SAMPLE_RATE 100
+#define SAMPLE_RATE 50
 
 class QuadratureConverter {
 
@@ -18,15 +18,18 @@ class QuadratureConverter {
       * Callback for receiving Twist messages from the odometry sensors.
       * We will convert this message into an official ROS Odometry message.
       */
-    void quadCallback(const geometry_msgs::TwistStamped& msg)
+    void quadCallback(const geometry_msgs::TwistStamped& arduino_odom_msg)
     {
       //ROS_INFO("I heard: [%s]", msg->data.c_str());
       ROS_INFO("I HEARD A QUAD MSG");
       printf("SEO: I heard a quad msg");
 
-      // TODO: convert Twist msg to Odometry msg
+      nav_msgs::Odometry odom_msg;
+      odom_msg.child_frame_id = "base_link";
+      odom_msg.twist.velocity.x = arduino_odom_msg.velocity.x;
+      odom_msg.velocity.x = arduino_odom_msg.velocity.x;
 
-      // TODO: odometry_pub.publish(odometry_msg);
+      odometry_pub.publish(odom_msg);
     }
 
   private:
