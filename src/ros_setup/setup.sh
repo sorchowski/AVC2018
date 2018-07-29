@@ -54,7 +54,7 @@ cp ../modules/gps/node_read_gps.cpp $ROS_WORKSPACE_HOME/src/$ROS_AVC_PROJECT_NAM
 cp ../modules/display/display.cpp $ROS_WORKSPACE_HOME/src/$ROS_AVC_PROJECT_NAME/src
 cp ../modules/convert/node_quad_convert.cpp $ROS_WORKSPACE_HOME/src/$ROS_AVC_PROJECT_NAME/src
 cp ../modules/convert/node_range_convert.cpp $ROS_WORKSPACE_HOME/src/$ROS_AVC_PROJECT_NAME/src
-cp ../modules/convery/node_imu_convert.cpp $ROS_WORKSPACE_HOME/src/$ROS_AVC_PROJECT_NAME/src
+cp ../modules/convert/node_imu_convert.cpp $ROS_WORKSPACE_HOME/src/$ROS_AVC_PROJECT_NAME/src
 
 #copy AVC/lib/common/*.* to <ros_workspace>/src/avc/include
 cp ../../lib/common/*.* $ROS_WORKSPACE_HOME/src/$ROS_AVC_PROJECT_NAME/include
