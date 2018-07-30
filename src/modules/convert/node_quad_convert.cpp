@@ -26,8 +26,7 @@ class QuadratureConverter {
 
       nav_msgs::Odometry odom_msg;
       odom_msg.child_frame_id = "base_link";
-      odom_msg.twist.velocity.x = arduino_odom_msg.velocity.x;
-      odom_msg.velocity.x = arduino_odom_msg.velocity.x;
+      odom_msg.twist.twist.linear.x = arduino_odom_msg.twist.linear.x;
 
       odometry_pub.publish(odom_msg);
     }

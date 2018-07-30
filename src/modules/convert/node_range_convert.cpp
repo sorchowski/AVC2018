@@ -3,6 +3,7 @@
 #include <pcl_ros/point_cloud.h>
 #include <pcl/point_types.h>
 #include <pcl_conversions/pcl_conversions.h>
+#include <tf/transform_listener.h>
 
 // AVC includes
 #include "ros_topics.h"
@@ -58,6 +59,8 @@ class RangeConverter {
 
     // subscriber for Range messages from the avc ir sensors.
     static ros::Subscriber range_sub;
+
+    static tf::TransformListener listener;
 };
 
 RangeConverter rangeConverter;
@@ -66,6 +69,8 @@ ros::NodeHandle n;
 
 ros::Publisher RangeConverter::pc_pub = n.advertise<PointCloud>("points2", 1000);
 ros::Subscriber RangeConverter::range_sub = n.subscribe(avc_common::ROS_TOPIC_RANGE, 1000, &RangeConverter::rangeMsgCallback, &rangeConverter);
+
+tf::TransformListener RangeConverter::listener(ros::Duration(10));
 
 int main(int argc, char **argv)
 {
