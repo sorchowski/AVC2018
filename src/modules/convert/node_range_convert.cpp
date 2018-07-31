@@ -3,6 +3,7 @@
 #include <pcl_ros/point_cloud.h>
 #include <pcl/point_types.h>
 #include <pcl_conversions/pcl_conversions.h>
+#include <tf/transform_listener.h>
 
 // AVC includes
 #include "ros_topics.h"
@@ -19,7 +20,11 @@ typedef pcl::PointCloud<pcl::PointXYZ> PointCloud;
 class RangeConverter {
 
   public:
-    RangeConverter() {}
+    RangeConverter() {
+      pc_pub = n.advertise<PointCloud>("points2", 1000);
+range_sub = n.subscribe(avc_common::ROS_TOPIC_RANGE, 1000, &RangeConverter::rangeMsgCallback, this);
+
+    }
 
     void rangeMsgCallback(const sensor_msgs::Range& r_msg)
     {
@@ -53,24 +58,29 @@ class RangeConverter {
 
   private:
 
+    ros::NodeHandle n;
     // publisher for point cloud messages
-    static ros::Publisher pc_pub;
+    ros::Publisher pc_pub;
 
     // subscriber for Range messages from the avc ir sensors.
-    static ros::Subscriber range_sub;
+    ros::Subscriber range_sub;
+
+    tf::TransformListener listener;
 };
 
-RangeConverter rangeConverter;
+//RangeConverter rangeConverter;
 
-ros::NodeHandle n;
+//ros::NodeHandle n;
 
-ros::Publisher RangeConverter::pc_pub = n.advertise<PointCloud>("points2", 1000);
-ros::Subscriber RangeConverter::range_sub = n.subscribe(avc_common::ROS_TOPIC_RANGE, 1000, &RangeConverter::rangeMsgCallback, &rangeConverter);
+//ros::Publisher RangeConverter::pc_pub = n.advertise<PointCloud>("points2", 1000);
+//ros::Subscriber RangeConverter::range_sub = n.subscribe(avc_common::ROS_TOPIC_RANGE, 1000, &RangeConverter::rangeMsgCallback, &rangeConverter);
+
+//tf::TransformListener RangeConverter::listener(ros::Duration(10));
 
 int main(int argc, char **argv)
 {
   ros::init(argc, argv, avc_common::NODE_NAME_CONVERT_RANGE);
-
+  RangeConverter rangeConverter;
   //TODO test both of these
   //ros::spin();
   while(true) { ros::Rate(SAMPLE_RATE).sleep(); ros::spinOnce(); }

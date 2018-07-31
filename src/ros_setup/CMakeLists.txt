@@ -11,7 +11,7 @@ project(avc)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
-find_package(catkin REQUIRED COMPONENTS roscpp roscpp_serialization rosconsole rostime message_generation sensor_msgs)
+find_package(catkin REQUIRED COMPONENTS roscpp roscpp_serialization rosconsole rostime message_generation sensor_msgs pcl_ros pcl_conversions)
 
 ################################################
 ## Declare ROS messages, services and actions ##
@@ -53,7 +53,8 @@ catkin_package(
 ## Your package locations should be listed before other locations
 include_directories(
   include
- ${catkin_INCLUDE_DIRS}
+  ${catkin_INCLUDE_DIRS}
+  ${PCL_INCLUDE_DIRS}
 )
 
 ## Declare a C++ executable
@@ -77,7 +78,7 @@ add_executable(avc_imu_convert src/node_imu_convert.cpp)
 ## Specify libraries to link a library or executable target against
 target_link_libraries(avc_gps_node nmea ${catkin_LIBRARIES})
 target_link_libraries(avc_quadrature_convert ${catkin_LIBRARIES})
-target_link_libraries(avc_range_convert ${catkin_LIBRARIES})
+target_link_libraries(avc_range_convert ${catkin_LIBRARIES} ${PCL_LIBRARIES})
 target_link_libraries(avc_imu_convert ${catkin_LIBRARIES})
 
 #############

@@ -12,6 +12,7 @@
 #include <string>
 #include <sstream>
 #include <vector>
+#include <cstdlib>
 
 #include <ros/ros.h>
 #include <sensor_msgs/Imu.h>
@@ -124,23 +125,23 @@ int main(int argc, char **argv) {
 			// orient_w
 
 			sensor_msgs::Imu imu_msg;
-		    imu_msg.header.stamp = nh.now();
+		    imu_msg.header.stamp = ros::Time::now();
 			imu_msg.header.frame_id = imuFrameId;
 
-		    imu_msg.linear_acceleration.x = imu_data[0]; //ax;
-		    imu_msg.linear_acceleration.y = imu_data[1]; //ay;
-	    	imu_msg.linear_acceleration.z = imu_data[2]; //az;
+		    imu_msg.linear_acceleration.x = std::atof(imu_data[0].c_str()); //ax;
+		    imu_msg.linear_acceleration.y = std::atof(imu_data[1].c_str()); //ay;
+	    	imu_msg.linear_acceleration.z = std::atof(imu_data[2].c_str()); //az;
     		imu_msg.linear_acceleration_covariance[0] = -1;
 
-    		imu_msg.angular_velocity.x = imu_data[3]; //gx;
-    		imu_msg.angular_velocity.y = imu_data[4]; //gy;
-    		imu_msg.angular_velocity.z = imu_data[5]; //gz;
+    		imu_msg.angular_velocity.x = std::atof(imu_data[3].c_str()); //gx;
+    		imu_msg.angular_velocity.y = std::atof(imu_data[4].c_str()); //gy;
+    		imu_msg.angular_velocity.z = std::atof( imu_data[5].c_str()); //gz;
     		imu_msg.angular_velocity_covariance[0] = -1;
 
-    		imu_msg.orientation.x = imu_data[6]; //*(getQ() + 1);
-    		imu_msg.orientation.y = imu_data[7]; //*(getQ() + 2);
-    		imu_msg.orientation.z = imu_data[8]; //*(getQ() + 3);
-    		imu_msg.orientation.w = imu_data[9]; //*(getQ());
+    		imu_msg.orientation.x = std::atof(imu_data[6].c_str()); //*(getQ() + 1);
+    		imu_msg.orientation.y = std::atof(imu_data[7].c_str()); //*(getQ() + 2);
+    		imu_msg.orientation.z = std::atof(imu_data[8].c_str()); //*(getQ() + 3);
+    		imu_msg.orientation.w = std::atof(imu_data[9].c_str()); //*(getQ());
 
 			imu_pub.publish(imu_msg);
             ros::spinOnce();
