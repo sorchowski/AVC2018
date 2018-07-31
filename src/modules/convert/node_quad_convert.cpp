@@ -12,6 +12,8 @@ class QuadratureConverter {
 
   public:
     QuadratureConverter() {
+      odometry_pub = n.advertise<nav_msgs::Odometry>("odom", 1000);
+      sub = n.subscribe(avc_common::ROS_TOPIC_ODOMETRY, 1000, &QuadratureConverter::quadCallback,&quadConverter);
     }
 
     /**
@@ -32,23 +34,21 @@ class QuadratureConverter {
     }
 
   private:
+
+    ros::NodeHandle n;
+
      // publisher for Odometry messages
-    static ros::Publisher odometry_pub;
+    ros::Publisher odometry_pub;
 
     // subscriber for Twist messages from the avc odometry sensors.
-    static ros::Subscriber sub;
+    ros::Subscriber sub;
 };
-
-QuadratureConverter quadConverter;
-
-ros::NodeHandle n;
-
-ros::Publisher QuadratureConverter::odometry_pub = n.advertise<nav_msgs::Odometry>("odom", 1000);
-ros::Subscriber QuadratureConverter::sub = n.subscribe(avc_common::ROS_TOPIC_ODOMETRY, 1000, &QuadratureConverter::quadCallback,&quadConverter);
 
 int main(int argc, char **argv)
 {
   ros::init(argc, argv, avc_common::NODE_NAME_CONVERT_QUADRATURE);
+
+  QuadratureConverter quadConverter;
 
   //TODO test both of these
   //ros::spin();
