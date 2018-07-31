@@ -3,13 +3,13 @@
     <node name="node_sonar" pkg="rosserial_python" type="serial_node.py" args="/dev/rosnode_sonar" respawn="true" />
     <node name="node_infrared" pkg="rosserial_python" type="serial_node.py" args="/dev/rosnode_nanoC" respawn="true" />
     <node name="avc_range_convert" pkg="avc" type="avc_range_convert" respawn="true" />
-
+    <node name="avc_imu_convert" pkg="avc" type="avc_imu_convert" respawn="true" />
+    <node name="avc_quadrature_convert" pkg="avc" type="avc_quadrature_convert" respawn="true" />
+    
     <!-- 90 degrees = 1.5708 radians-->
     <!-- http://wiki.ros.org/tf#static_transform_publisher-->
     <!--static_transform_publisher x y z yaw pitch roll frame_id child_frame_id period_in_ms-->
     <node pkg="tf" type="static_transform_publisher" name="sonar1_tf_broadcaster" args="0.10 0.05 0 1.5708 0 0 0 base_link s1 500" />
 
-    <!--node name="avc_imu_convert" pkg="avc" type="avc_imu_convert" respawn="true" /-->
-    <!--node name="avc_quadrature_convert" pkg="avc" type="avc_quadrature_convert" respawn="true" /-->
-    <!--node name="node_gps" pkg="">
+    <!--node name="node_gps" pkg=""-->
 </launch>

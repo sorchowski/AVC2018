@@ -107,7 +107,7 @@ int main(int argc, char **argv) {
 
 	        std::string word;
     	    std::stringstream stream(buffer);
-        	std::vector<std::string> imu_data(10);
+        	std::vector<std::string> imu_data;
         	while( std::getline(stream, word, ',') ) {
                 imu_data.push_back(word);
         	}
