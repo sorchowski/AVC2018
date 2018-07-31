@@ -23,7 +23,7 @@ ros::NodeHandle nh;
 //http://docs.ros.org/api/sensor_msgs/html/msg/Range.html
 sensor_msgs::Range range_message;
 
-ros::Publisher sonarPublisher(avc_common::ROS_TOPIC_SONAR, &range_message);
+ros::Publisher sonarPublisher(avc_common::ROS_TOPIC_RANGE, &range_message);
 
 Sonar::SonarArray sonarArray(NUM_SENSORS);
 
@@ -35,25 +35,25 @@ unsigned int current_sensor_num = 1;
 void setFrameId(int sensorNum) {
   switch(sensorNum) {
     case 1:
-      range_message.header.frame_id = "1";
+      range_message.header.frame_id = "s1";
       break;
     case 2:
-      range_message.header.frame_id = "2";
+      range_message.header.frame_id = "s2";
       break;
     case 3:
-      range_message.header.frame_id = "3";
+      range_message.header.frame_id = "s3";
       break;
     case 4:
-      range_message.header.frame_id = "4";
+      range_message.header.frame_id = "s4";
       break;
     case 5:
-      range_message.header.frame_id = "5";
+      range_message.header.frame_id = "s5";
       break;
     case 6:
-      range_message.header.frame_id = "6";
+      range_message.header.frame_id = "s6";
       break;
     case 7:
-      range_message.header.frame_id = "7";
+      range_message.header.frame_id = "s7";
       break;
     case 8:
     default:

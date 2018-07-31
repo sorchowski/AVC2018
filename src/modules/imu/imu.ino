@@ -1,3 +1,4 @@
+
 // MPU9250-specific code is from https://github.com/sparkfun/MPU-9250_Breakout
 
 #include "quaternionFilters.h"
@@ -7,31 +8,31 @@
 #define SerialDebug false // Set to true to get Serial output for debugging
 
 #define GS_PER_METSECSQ 0.10197162129779
+#define IMU_VALUES_PRECISION 8
 
 // 10 times per second
-#define SAMPLE_RATE 100
+#define SAMPLE_RATE 50
 
 MPU9250 myIMU;
-
-//ros::Publisher imuPublisher(avc_common::ROS_TOPIC_IMU, &imu_message);
-//ros::Publisher magPublisher(avc_common::ROS_TOPIC_MAG, &mag_message);
 
 void setup()
 {
   Wire.begin();
   // TWBR = 12;  // 400 kbit/sec I2C speed
 
-  Serial.begin(57600);
-
+  SerialUSB.begin(57600);
+  while (!SerialUSB) {
+    ; // wait for serial port to connect
+  }
   if (SerialDebug) {
-    Serial.println("hello");
+    SerialUSB.println("hello");
   }
 
   // Read the WHO_AM_I register, this is a good test of communication
   byte c = myIMU.readByte(MPU9250_ADDRESS, WHO_AM_I_MPU9250);
   if (SerialDebug) {
-    Serial.print("MPU9250 "); Serial.print("I AM "); Serial.print(c, HEX);
-    Serial.print(" I should be "); Serial.println(0x71, HEX);
+    SerialUSB.print("MPU9250 "); SerialUSB.print("I AM "); SerialUSB.print(c, HEX);
+    SerialUSB.print(" I should be "); SerialUSB.println(0x71, HEX);
   }
 
   if (c == 0x71) // WHO_AM_I should always be 0x68
@@ -40,19 +41,19 @@ void setup()
     myIMU.MPU9250SelfTest(myIMU.SelfTest);
 
     if (SerialDebug) {
-      Serial.println("MPU9250 is online...");
-      Serial.print("x-axis self test: acceleration trim within : ");
-      Serial.print(myIMU.SelfTest[0],1); Serial.println("% of factory value");
-      Serial.print("y-axis self test: acceleration trim within : ");
-      Serial.print(myIMU.SelfTest[1],1); Serial.println("% of factory value");
-      Serial.print("z-axis self test: acceleration trim within : ");
-      Serial.print(myIMU.SelfTest[2],1); Serial.println("% of factory value");
-      Serial.print("x-axis self test: gyration trim within : ");
-      Serial.print(myIMU.SelfTest[3],1); Serial.println("% of factory value");
-      Serial.print("y-axis self test: gyration trim within : ");
-      Serial.print(myIMU.SelfTest[4],1); Serial.println("% of factory value");
-      Serial.print("z-axis self test: gyration trim within : ");
-      Serial.print(myIMU.SelfTest[5],1); Serial.println("% of factory value");
+      SerialUSB.println("MPU9250 is online...");
+      SerialUSB.print("x-axis self test: acceleration trim within : ");
+      SerialUSB.print(myIMU.SelfTest[0],1); SerialUSB.println("% of factory value");
+      SerialUSB.print("y-axis self test: acceleration trim within : ");
+      SerialUSB.print(myIMU.SelfTest[1],1); SerialUSB.println("% of factory value");
+      SerialUSB.print("z-axis self test: acceleration trim within : ");
+      SerialUSB.print(myIMU.SelfTest[2],1); SerialUSB.println("% of factory value");
+      SerialUSB.print("x-axis self test: gyration trim within : ");
+      SerialUSB.print(myIMU.SelfTest[3],1); SerialUSB.println("% of factory value");
+      SerialUSB.print("y-axis self test: gyration trim within : ");
+      SerialUSB.print(myIMU.SelfTest[4],1); SerialUSB.println("% of factory value");
+      SerialUSB.print("z-axis self test: gyration trim within : ");
+      SerialUSB.print(myIMU.SelfTest[5],1); SerialUSB.println("% of factory value");
     }
 
     // Calibrate gyro and accelerometers, load biases in bias registers
@@ -66,8 +67,8 @@ void setup()
     // communication
     byte d = myIMU.readByte(AK8963_ADDRESS, WHO_AM_I_AK8963);
     if (SerialDebug) {
-      Serial.print("AK8963 "); Serial.print("I AM "); Serial.print(d, HEX);
-      Serial.print(" I should be "); Serial.println(0x48, HEX);
+      SerialUSB.print("AK8963 "); SerialUSB.print("I AM "); SerialUSB.print(d, HEX);
+      SerialUSB.print(" I should be "); SerialUSB.println(0x48, HEX);
     }
 
     // Get magnetometer calibration from AK8963 ROM
@@ -76,22 +77,22 @@ void setup()
 
     if (SerialDebug)
     {
-      Serial.println("AK8963 initialized for active data mode....");
-      Serial.println("Calibration values: ");
-      Serial.print("X-Axis sensitivity adjustment value ");
-      Serial.println(myIMU.magCalibration[0], 2);
-      Serial.print("Y-Axis sensitivity adjustment value ");
-      Serial.println(myIMU.magCalibration[1], 2);
-      Serial.print("Z-Axis sensitivity adjustment value ");
-      Serial.println(myIMU.magCalibration[2], 2);
+      SerialUSB.println("AK8963 initialized for active data mode....");
+      SerialUSB.println("Calibration values: ");
+      SerialUSB.print("X-Axis sensitivity adjustment value ");
+      SerialUSB.println(myIMU.magCalibration[0], 2);
+      SerialUSB.print("Y-Axis sensitivity adjustment value ");
+      SerialUSB.println(myIMU.magCalibration[1], 2);
+      SerialUSB.print("Z-Axis sensitivity adjustment value ");
+      SerialUSB.println(myIMU.magCalibration[2], 2);
     }
 
   } // if (c == 0x71)
   else
   {
     if (SerialDebug) {
-      Serial.print("Could not connect to MPU9250: 0x");
-      Serial.println(c, HEX);
+      SerialUSB.print("Could not connect to MPU9250: 0x");
+      SerialUSB.println(c, HEX);
     }
 
     error(); // Go into error mode and hold steady
@@ -189,20 +190,20 @@ void loop()
     float orientation_z = *(getQ() + 3);
     float orientation_w = *(getQ());
 
-    String lin_acc_x = String(linear_acceleration_x);
-    String lin_acc_y = String(linear_acceleration_y);
-    String lin_acc_z = String(linear_acceleration_z);
+    String lin_acc_x = String(linear_acceleration_x, IMU_VALUES_PRECISION);
+    String lin_acc_y = String(linear_acceleration_y, IMU_VALUES_PRECISION);
+    String lin_acc_z = String(linear_acceleration_z, IMU_VALUES_PRECISION);
 
-    String ang_vel_x = String(angular_velocity_x);
-    String ang_vel_y = String(angular_velocity_y);
-    String ang_vel_z = String(angular_velocity_z);
+    String ang_vel_x = String(angular_velocity_x, IMU_VALUES_PRECISION);
+    String ang_vel_y = String(angular_velocity_y, IMU_VALUES_PRECISION);
+    String ang_vel_z = String(angular_velocity_z, IMU_VALUES_PRECISION);
 
-    String orient_x = String(orientation_x);
-    String orient_y = String(orientation_y);
-    String orient_z = String(orientation_z);
-    String orient_w = String(orientation_w);
+    String orient_x = String(orientation_x, IMU_VALUES_PRECISION);
+    String orient_y = String(orientation_y, IMU_VALUES_PRECISION);
+    String orient_z = String(orientation_z, IMU_VALUES_PRECISION);
+    String orient_w = String(orientation_w, IMU_VALUES_PRECISION);
 
-    Serial.print(lin_acc_x+","+lin_acc_y+","+lin_acc_z+","+ang_vel_x+","+ang_vel_y+","+ang_vel_z+","+orient_x+","+orient_y+","+orient_z+","+orient_w);
+    SerialUSB.println(lin_acc_x+","+lin_acc_y+","+lin_acc_z+","+ang_vel_x+","+ang_vel_y+","+ang_vel_z+","+orient_x+","+orient_y+","+orient_z+","+orient_w);
 
     /*
     myIMU.yaw   = atan2(2.0f * (*(getQ()+1) * *(getQ()+2) + *getQ() *

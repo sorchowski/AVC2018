@@ -27,7 +27,7 @@ const char ir1FrameId[] = "ir_left";
 const char ir2FrameId[] = "ir_center";
 const char ir3FrameId[] = "ir_right";
 
-ros::Publisher infraredPublisher(avc_common::ROS_TOPIC_INFRARED, &range_message);
+ros::Publisher infraredPublisher(avc_common::ROS_TOPIC_RANGE, &range_message);
 
 unsigned long timer = 0;
 
