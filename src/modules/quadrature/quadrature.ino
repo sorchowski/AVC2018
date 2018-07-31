@@ -11,7 +11,7 @@
 #define SerialDebug false
 
 #define ENCODER1_SS 5
-#define ENCODER2_SS 11
+#define ENCODER2_SS 10
 
 // 10 times a second
 #define SAMPLE_RATE 100
