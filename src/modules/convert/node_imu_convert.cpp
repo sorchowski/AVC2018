@@ -87,7 +87,7 @@ int main(int argc, char **argv) {
 	// Initialize ROS stuff
 	ros::init(argc, argv, avc_common::NODE_NAME_IMU);
 	ros::NodeHandle nh;
-	ros::Publisher imu_pub = nh.advertise<sensor_msgs::Imu>("imu", 1000);
+	ros::Publisher imu_pub = nh.advertise<sensor_msgs::Imu>("imu/data", 1000);
 
 	// Initialize the serial connection to the GPS device with correct read settings
 	configure_usb(usb_fd);

@@ -12,7 +12,7 @@ class QuadratureConverter {
 
   public:
     QuadratureConverter() {
-      odometry_pub = n.advertise<nav_msgs::Odometry>("odom", 1000);
+      odometry_pub = n.advertise<nav_msgs::Odometry>("avc_odom", 1000);
       sub = n.subscribe(avc_common::ROS_TOPIC_ODOMETRY, 1000, &QuadratureConverter::quadCallback, this);
     }
 
