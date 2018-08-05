@@ -105,12 +105,12 @@ int main(int argc, char **argv) {
 			// Example buffer string contents:
 			// buffer string: -0.012193,-0.012547,0.089287,0.000266,0.002264,-0.000799,-0.072839,0.063523,0.052157,0.993951
 
-	        std::string word;
-    	    std::stringstream stream(buffer);
-        	std::vector<std::string> imu_data;
-        	while( std::getline(stream, word, ',') ) {
-                imu_data.push_back(word);
-        	}
+			std::string word;
+			std::stringstream stream(buffer);
+			std::vector<std::string> imu_data;
+			while( std::getline(stream, word, ',') ) {
+				imu_data.push_back(word);
+			}
 
 			// order of imu data is thus:
 			// lin_acc_x
@@ -125,26 +125,26 @@ int main(int argc, char **argv) {
 			// orient_w
 
 			sensor_msgs::Imu imu_msg;
-		    imu_msg.header.stamp = ros::Time::now();
+			imu_msg.header.stamp = ros::Time::now();
 			imu_msg.header.frame_id = imuFrameId;
 
-		    imu_msg.linear_acceleration.x = std::atof(imu_data[0].c_str()); //ax;
-		    imu_msg.linear_acceleration.y = std::atof(imu_data[1].c_str()); //ay;
-	    	imu_msg.linear_acceleration.z = std::atof(imu_data[2].c_str()); //az;
-    		imu_msg.linear_acceleration_covariance[0] = -1;
+			imu_msg.linear_acceleration.x = std::atof(imu_data[0].c_str()); //ax;
+			imu_msg.linear_acceleration.y = std::atof(imu_data[1].c_str()); //ay;
+			imu_msg.linear_acceleration.z = std::atof(imu_data[2].c_str()); //az;
+			imu_msg.linear_acceleration_covariance[0] = -1;
 
-    		imu_msg.angular_velocity.x = std::atof(imu_data[3].c_str()); //gx;
-    		imu_msg.angular_velocity.y = std::atof(imu_data[4].c_str()); //gy;
-    		imu_msg.angular_velocity.z = std::atof( imu_data[5].c_str()); //gz;
-    		imu_msg.angular_velocity_covariance[0] = -1;
+			imu_msg.angular_velocity.x = std::atof(imu_data[3].c_str()); //gx;
+			imu_msg.angular_velocity.y = std::atof(imu_data[4].c_str()); //gy;
+			imu_msg.angular_velocity.z = std::atof(imu_data[5].c_str()); //gz;
+			imu_msg.angular_velocity_covariance[0] = -1;
 
-    		imu_msg.orientation.x = std::atof(imu_data[6].c_str()); //*(getQ() + 1);
-    		imu_msg.orientation.y = std::atof(imu_data[7].c_str()); //*(getQ() + 2);
-    		imu_msg.orientation.z = std::atof(imu_data[8].c_str()); //*(getQ() + 3);
-    		imu_msg.orientation.w = std::atof(imu_data[9].c_str()); //*(getQ());
+			imu_msg.orientation.x = std::atof(imu_data[6].c_str()); //*(getQ() + 1);
+			imu_msg.orientation.y = std::atof(imu_data[7].c_str()); //*(getQ() + 2);
+			imu_msg.orientation.z = std::atof(imu_data[8].c_str()); //*(getQ() + 3);
+			imu_msg.orientation.w = std::atof(imu_data[9].c_str()); //*(getQ());
 
 			imu_pub.publish(imu_msg);
-            ros::spinOnce();
+			ros::spinOnce();
         }
     }
 }
