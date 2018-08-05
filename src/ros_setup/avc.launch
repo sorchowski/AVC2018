@@ -5,6 +5,10 @@
     <node name="avc_range_convert" pkg="avc" type="avc_range_convert" respawn="true" />
     <node name="avc_imu_convert" pkg="avc" type="avc_imu_convert" respawn="true" />
     <node name="avc_quadrature_convert" pkg="avc" type="avc_quadrature_convert" respawn="true" />
+
+
+    <!--node name="node_ekf" pkg="robot_localization" type="ekf_localization_node" clear_params="true"-->
+        <rosparam command="load" file="$(find avc)/param/ekf_config.yaml" />
     
     <!-- 90 degrees = 1.5708 radians-->
     <!-- http://wiki.ros.org/tf#static_transform_publisher-->

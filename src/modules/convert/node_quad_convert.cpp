@@ -27,6 +27,7 @@ class QuadratureConverter {
       printf("SEO: I heard a quad msg");
 
       nav_msgs::Odometry odom_msg;
+      odom_msg.header.frame_id = "odom";
       odom_msg.child_frame_id = "base_link";
       odom_msg.twist.twist.linear.x = arduino_odom_msg.twist.linear.x;
 

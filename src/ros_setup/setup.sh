@@ -39,6 +39,7 @@ if [ ! -d "$ROS_WORKSPACE_HOME/src/$ROS_AVC_PROJECT_NAME" ]; then
     catkin_create_pkg $ROS_AVC_PROJECT_NAME
     mkdir -p $ROS_WORKSPACE_HOME/src/$ROS_AVC_PROJECT_NAME/include
     mkdir -p $ROS_WORKSPACE_HOME/src/$ROS_AVC_PROJECT_NAME/src
+    mkdir -p $ROS_WORKSPACE_HOME/src/$ROS_AVC_PROJECT_NAME/param
     cd -
 fi
 
@@ -50,11 +51,12 @@ cp avc.launch $ROS_WORKSPACE_HOME/src/$ROS_AVC_PROJECT_NAME/
 
 #copy our own modules to <ros_workspace>/src/avc/src
 echo 'Copying avc source files'
-cp ../modules/gps/node_read_gps.cpp $ROS_WORKSPACE_HOME/src/$ROS_AVC_PROJECT_NAME/src
-cp ../modules/display/display.cpp $ROS_WORKSPACE_HOME/src/$ROS_AVC_PROJECT_NAME/src
-cp ../modules/convert/node_quad_convert.cpp $ROS_WORKSPACE_HOME/src/$ROS_AVC_PROJECT_NAME/src
-cp ../modules/convert/node_range_convert.cpp $ROS_WORKSPACE_HOME/src/$ROS_AVC_PROJECT_NAME/src
-cp ../modules/convert/node_imu_convert.cpp $ROS_WORKSPACE_HOME/src/$ROS_AVC_PROJECT_NAME/src
+cp ../modules/gps/node_read_gps.cpp $ROS_WORKSPACE_HOME/src/$ROS_AVC_PROJECT_NAME/src/
+cp ../modules/display/display.cpp $ROS_WORKSPACE_HOME/src/$ROS_AVC_PROJECT_NAME/src/
+cp ../modules/convert/node_quad_convert.cpp $ROS_WORKSPACE_HOME/src/$ROS_AVC_PROJECT_NAME/src/
+cp ../modules/convert/node_range_convert.cpp $ROS_WORKSPACE_HOME/src/$ROS_AVC_PROJECT_NAME/src/
+cp ../modules/convert/node_imu_convert.cpp $ROS_WORKSPACE_HOME/src/$ROS_AVC_PROJECT_NAME/src/
+cp ../modules/nav/ekf_config.yaml $ROS_WORKSPACE_HOME/src/$ROS_AVC_PROJECT_NAME/param/
 
 #copy AVC/lib/common/*.* to <ros_workspace>/src/avc/include
 cp ../../lib/common/*.* $ROS_WORKSPACE_HOME/src/$ROS_AVC_PROJECT_NAME/include
