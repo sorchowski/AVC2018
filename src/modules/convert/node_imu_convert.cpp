@@ -133,24 +133,20 @@ int main(int argc, char **argv) {
 			imu_msg.linear_acceleration.y = std::atof(imu_data[1].c_str()); //ay;
 			imu_msg.linear_acceleration.z = std::atof(imu_data[2].c_str()); //az;
 			// TODO: determine better values for these?
-			std::fill_n(imu_msg.linear_acceleration_covariance, 9, 0.0);
+			for (int i=0;i<9;i++) { imu_msg.linear_acceleration_covariance[i] = 0.0; }
 
 			imu_msg.angular_velocity.x = std::atof(imu_data[3].c_str()); //gx;
 			imu_msg.angular_velocity.y = std::atof(imu_data[4].c_str()); //gy;
 			imu_msg.angular_velocity.z = std::atof(imu_data[5].c_str()); //gz;
 			// TODO: determine better values for these?
-			std::fill_n(imu_msg.angular_velocity_covariance, 9, 0.0);
-
-			imu_msg.angular_velocity_covariance[0] = 0.0;
-			imu_msg.angular_velocity_covariance[4] = 0.0;
-			imu_msg.angular_velocity_covariance[8] = 0.0;
+			for (int i=0;i<9;i++) { imu_msg.angular_velocity_covariance[i] = 0.0; }
 
 			imu_msg.orientation.x = std::atof(imu_data[6].c_str()); //*(getQ() + 1);
 			imu_msg.orientation.y = std::atof(imu_data[7].c_str()); //*(getQ() + 2);
 			imu_msg.orientation.z = std::atof(imu_data[8].c_str()); //*(getQ() + 3);
 			imu_msg.orientation.w = std::atof(imu_data[9].c_str()); //*(getQ());
 			// TODO: determine better values for these?
-			std::fill_n(imu_msg.orientation_covariance, 9, 0.0);
+			for (int i=0;i<9;i++) { imu_msg.orientation_covariance[i] = 0.0; }
 
 			imu_pub.publish(imu_msg);
 			ros::spinOnce();
