@@ -13,6 +13,7 @@
 #include <sstream>
 #include <vector>
 #include <cstdlib>
+#include <algorithm>
 
 #include <ros/ros.h>
 #include <sensor_msgs/Imu.h>
@@ -51,7 +52,7 @@ int configure_usb(int ser_fd) {
 	tty.c_cc[VTIME]  =  50;               // 5 seconds read timeout
 	tty.c_cflag     |=  CREAD | CLOCAL;   // turn on READ & ignore ctrl lines
 	tty.c_lflag     |= ICANON;            // Enable canonical mode
-	tty.c_lflag     &=  ~ECHO;            // Disable echo; otherwise, the gps device will return "unknown message"
+	tty.c_lflag     &=  ~ECHO;            // Disable echo. We don't want to transmit anything to the device.
 	tty.c_lflag     &=  ~ECHONL;          // Disable new line echo
 
 	//cfmakeraw(&tty);
@@ -131,17 +132,25 @@ int main(int argc, char **argv) {
 			imu_msg.linear_acceleration.x = std::atof(imu_data[0].c_str()); //ax;
 			imu_msg.linear_acceleration.y = std::atof(imu_data[1].c_str()); //ay;
 			imu_msg.linear_acceleration.z = std::atof(imu_data[2].c_str()); //az;
-			imu_msg.linear_acceleration_covariance[0] = -1;
+			// TODO: determine better values for these?
+			std::fill_n(imu_msg.linear_acceleration_covariance, 9, 0.0);
 
 			imu_msg.angular_velocity.x = std::atof(imu_data[3].c_str()); //gx;
 			imu_msg.angular_velocity.y = std::atof(imu_data[4].c_str()); //gy;
 			imu_msg.angular_velocity.z = std::atof(imu_data[5].c_str()); //gz;
-			imu_msg.angular_velocity_covariance[0] = -1;
+			// TODO: determine better values for these?
+			std::fill_n(imu_msg.angular_velocity_covariance, 9, 0.0);
+
+			imu_msg.angular_velocity_covariance[0] = 0.0;
+			imu_msg.angular_velocity_covariance[4] = 0.0;
+			imu_msg.angular_velocity_covariance[8] = 0.0;
 
 			imu_msg.orientation.x = std::atof(imu_data[6].c_str()); //*(getQ() + 1);
 			imu_msg.orientation.y = std::atof(imu_data[7].c_str()); //*(getQ() + 2);
 			imu_msg.orientation.z = std::atof(imu_data[8].c_str()); //*(getQ() + 3);
 			imu_msg.orientation.w = std::atof(imu_data[9].c_str()); //*(getQ());
+			// TODO: determine better values for these?
+			std::fill_n(imu_msg.orientation_covariance, 9, 0.0);
 
 			imu_pub.publish(imu_msg);
 			ros::spinOnce();
