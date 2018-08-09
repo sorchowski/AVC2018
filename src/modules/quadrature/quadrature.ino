@@ -8,7 +8,6 @@
 #include "node_names.h"
 
 #define RosPublish true
-#define SerialDebug false
 
 #define ENCODER1_SS 5
 #define ENCODER2_SS 10
@@ -37,10 +36,6 @@ unsigned long last_count1 = 0;
 unsigned long last_count2 = 0;
 
 void setup(){
-  if (SerialDebug) {
-    Serial.begin(115200);
-  }
-
   pinMode(ENCODER1_SS, OUTPUT);
   pinMode(ENCODER2_SS, OUTPUT);
   SPI.begin();
@@ -84,13 +79,6 @@ void loop() {
 
     last_count1=count1;
     last_count2=count2;
-
-    if (SerialDebug) {
-      String debugMsgStr = "Count: "+String(count1)+", status: "+String(status1);
-      Serial.println(debugMsgStr);
-      String debugString2 = "V: "+String(velocity);
-      Serial.println(debugString2);
-    }
 
     if (RosPublish) {
       odom_message.header.stamp = nh.now();
