@@ -23,6 +23,11 @@
 #include "node_names.h"
 #include "device_paths.h"
 
+// There was a technical issue which necessitated using this conversion node to read the data coming
+// from the Zero. The Arduino Zero isn't currently supported by the rosserial package due to the
+// setup of the Zero's usb serial ports. Therefore, the zero will publish data directly over a
+// conventional linux serial port and we'll use this node to convert the raw data to a ros message.
+
 const char imuFrameId[] = "imu";
 
 // Way overkill, but meh...

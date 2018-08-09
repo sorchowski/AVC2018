@@ -1,12 +1,15 @@
 #include "ros/ros.h"
 #include "geometry_msgs/TwistStamped.h"
-#include "nav_msgs/Odometry.h"
 #include "geometry_msgs/TwistWithCovarianceStamped.h"
-
 
 // AVC includes
 #include "ros_topics.h"
 #include "node_names.h"
+
+// This conversion node is necessary, because the ros publish buffer size is too small for a 
+// TwistWithCovarianceStamped message. Instead of modifying ros.h, this conversion node will
+// convert the TwistStamped message to one with covariance and send that on the necessary odom
+// topic for consumption by the ekf localization node.
 
 #define SAMPLE_RATE 50
 

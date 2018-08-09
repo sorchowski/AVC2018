@@ -10,7 +10,6 @@ namespace avc_common
 	static const char* ROS_TOPIC_MAG        = "ros_topic_mag";
 	static const char* ROS_TOPIC_ODOMETRY   = "ros_topic_odom";
 	static const char* ROS_TOPIC_GPS        = "ros_topic_gps";
-	static const char* ROS_TOPIC_ACTION     = "ros_topic_action"; // i.e. steering and setting speed
 }
 
 #endif // ROS_TOPICS_H
