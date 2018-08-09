@@ -6,14 +6,16 @@
     <node name="avc_imu_convert" pkg="avc" type="avc_imu_convert" respawn="true" />
     <node name="avc_quadrature_convert" pkg="avc" type="avc_quadrature_convert" respawn="true" />
 
-
-    <!--node name="node_ekf" pkg="robot_localization" type="ekf_localization_node" clear_params="true"-->
+    <node name="node_ekf" pkg="robot_localization" type="ekf_localization_node" clear_params="true">
         <rosparam command="load" file="$(find avc)/param/ekf_config.yaml" />
-    
+    </node>
+
     <!-- 90 degrees = 1.5708 radians-->
     <!-- http://wiki.ros.org/tf#static_transform_publisher-->
     <!--static_transform_publisher x y z yaw pitch roll frame_id child_frame_id period_in_ms-->
-    <node pkg="tf" type="static_transform_publisher" name="sonar1_tf_broadcaster" args="0.10 0.05 0 1.5708 0 0 0 base_link s1 500" />
+    <node pkg="tf" type="static_transform_publisher" name="sonar1_tf_broadcaster" args="0.10 0.05 0 1.5708 0 0 0 base_link s1 100" />
+    <node pkg="tf" type="static_transform_publisher" name="imu_to_bl" args="0 0 0 0 0 0 1 base_link imu 100" />
+    <!--node pkg="tf" type="static_transform_publisher" name="bf_to_bl" args="0 0 0 0 0 0 1 base_footprint base_link 500" /-->
 
     <!--node name="node_gps" pkg=""-->
 </launch>
