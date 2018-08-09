@@ -29,12 +29,9 @@ class RangeConverter {
     void rangeMsgCallback(const sensor_msgs::Range& r_msg)
     {
       //ROS_INFO("I heard: [%s]", msg->data.c_str());
-      ROS_INFO("I HEARD A Range MSG");
-      printf("SEO: I heard a range msg");
 
       // For testing, just look at the left sonar sensor rotated 90
       if (r_msg.header.frame_id=="s1") {
-        printf("SEO: I heard a s1 msg with distance value: %f", r_msg.range);
         geometry_msgs::PointStamped range_point;
         range_point.header.frame_id = r_msg.header.frame_id;
         range_point.point.x = r_msg.range;
@@ -44,7 +41,6 @@ class RangeConverter {
         float x = base_point.point.x;
         float y = base_point.point.y;
         float z = base_point.point.z;
-        printf("SEO: converted range message, x: %f, y: %f",x, y);
         //http://wiki.ros.org/pcl_ros#ROS_C.2B-.2B-_interface
         PointCloud::Ptr pc_msg (new PointCloud);
         pc_msg->header.frame_id = "base_link";
