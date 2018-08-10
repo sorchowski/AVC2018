@@ -48,6 +48,7 @@ echo 'Copying avc package setup files'
 cp CMakeLists.txt $ROS_WORKSPACE_HOME/src/$ROS_AVC_PROJECT_NAME/
 cp package.xml $ROS_WORKSPACE_HOME/src/$ROS_AVC_PROJECT_NAME/
 cp avc.launch $ROS_WORKSPACE_HOME/src/$ROS_AVC_PROJECT_NAME/
+cp avc_nav.launch $ROS_WORKSPACE_HOME/src/$ROS_AVC_PROJECT_NAME/
 
 #copy our own modules to <ros_workspace>/src/avc/src
 echo 'Copying avc source files'
@@ -56,7 +57,7 @@ cp ../modules/display/display.cpp $ROS_WORKSPACE_HOME/src/$ROS_AVC_PROJECT_NAME/
 cp ../modules/convert/node_quad_convert.cpp $ROS_WORKSPACE_HOME/src/$ROS_AVC_PROJECT_NAME/src/
 cp ../modules/convert/node_range_convert.cpp $ROS_WORKSPACE_HOME/src/$ROS_AVC_PROJECT_NAME/src/
 cp ../modules/convert/node_imu_convert.cpp $ROS_WORKSPACE_HOME/src/$ROS_AVC_PROJECT_NAME/src/
-cp ../modules/nav/ekf_config.yaml $ROS_WORKSPACE_HOME/src/$ROS_AVC_PROJECT_NAME/param/
+cp ../modules/nav/*.yaml $ROS_WORKSPACE_HOME/src/$ROS_AVC_PROJECT_NAME/param/
 
 #copy AVC/lib/common/*.* to <ros_workspace>/src/avc/include
 cp ../../lib/common/*.* $ROS_WORKSPACE_HOME/src/$ROS_AVC_PROJECT_NAME/include
