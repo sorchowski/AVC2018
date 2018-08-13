@@ -12,8 +12,8 @@ int analogReadPins[NUM_SENSORS] = {A1, A2, A3};
 #define RosPublish true
 #define SerialDebug false
 
-// 10 times per second
-#define SAMPLE_RATE 100
+// 20 times per second
+#define SAMPLE_RATE 50
 
 #define MAX_RANGE 5.0
 #define MIN_RANGE 1.0
