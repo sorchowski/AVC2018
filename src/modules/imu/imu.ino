@@ -10,7 +10,7 @@
 #define GS_PER_METSECSQ 0.10197162129779
 #define IMU_VALUES_PRECISION 8
 
-// 10 times per second
+// 20 times per second
 #define SAMPLE_RATE 50
 
 MPU9250 myIMU;
