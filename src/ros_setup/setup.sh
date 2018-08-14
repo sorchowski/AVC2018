@@ -32,7 +32,6 @@ else
 fi
 
 #create 'src' and 'include' directories under <ros workspace>/src/avc/ if necessary
-
 if [ ! -d "$ROS_WORKSPACE_HOME/src/$ROS_AVC_PROJECT_NAME" ]; then
     echo 'avc package does not exist, creating'
     cd $ROS_WORKSPACE_HOME/src/
@@ -58,6 +57,7 @@ cp ../modules/convert/node_quad_convert.cpp $ROS_WORKSPACE_HOME/src/$ROS_AVC_PRO
 cp ../modules/convert/node_range_convert.cpp $ROS_WORKSPACE_HOME/src/$ROS_AVC_PROJECT_NAME/src/
 cp ../modules/convert/node_imu_convert.cpp $ROS_WORKSPACE_HOME/src/$ROS_AVC_PROJECT_NAME/src/
 cp ../modules/nav/*.yaml $ROS_WORKSPACE_HOME/src/$ROS_AVC_PROJECT_NAME/param/
+cp ../modules/goals/simple_navigation_goals.cpp $ROS_WORKSPACE_HOME/src/$ROS_AVC_PROJECT_NAME/src/
 
 #copy AVC/lib/common/*.* to <ros_workspace>/src/avc/include
 cp ../../lib/common/*.* $ROS_WORKSPACE_HOME/src/$ROS_AVC_PROJECT_NAME/include

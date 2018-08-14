@@ -11,7 +11,7 @@ project(avc)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
-find_package(catkin REQUIRED COMPONENTS roscpp roscpp_serialization rosconsole rostime message_generation sensor_msgs pcl_ros pcl_conversions)
+find_package(catkin REQUIRED COMPONENTS roscpp roscpp_serialization rosconsole rostime message_generation sensor_msgs pcl_ros pcl_conversions move_base_msgs actionlib_msgs actionlib)
 
 ################################################
 ## Declare ROS messages, services and actions ##
@@ -26,7 +26,8 @@ find_package(catkin REQUIRED COMPONENTS roscpp roscpp_serialization rosconsole r
 ## Generate added messages and services with any dependencies listed here
 generate_messages(
    DEPENDENCIES
-   sensor_msgs  # Or other packages containing msgs
+   sensor_msgs
+   actionlib_msgs
 )
 
 ###################################
@@ -64,6 +65,7 @@ add_executable(avc_gps_node src/node_read_gps.cpp)
 add_executable(avc_quadrature_convert src/node_quad_convert.cpp)
 add_executable(avc_range_convert src/node_range_convert.cpp)
 add_executable(avc_imu_convert src/node_imu_convert.cpp)
+add_executable(avc_simple_goals src/simple_navigation_goals.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -80,6 +82,7 @@ target_link_libraries(avc_gps_node nmea ${catkin_LIBRARIES})
 target_link_libraries(avc_quadrature_convert ${catkin_LIBRARIES})
 target_link_libraries(avc_range_convert ${catkin_LIBRARIES} ${PCL_LIBRARIES})
 target_link_libraries(avc_imu_convert ${catkin_LIBRARIES})
+target_link_libraries(avc_simple_goals ${catkin_LIBRARIES})
 
 #############
 ## Install ##
