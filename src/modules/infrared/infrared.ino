@@ -85,7 +85,10 @@ void loop()
       int calculatedDistance = 0;
 
       if (infraredReadValue < 513 || infraredReadValue > 279) {
-        // values lower than 1.0m and higher than 5.0m are thrown away.
+        // values lower than 1.0m and higher than 5.0m are outside the
+        // possible range of the infrared sensors. These values will be
+        // used to clear existing point values.
+
         if (infraredReadValue <= 512 && infraredReadValue >= 409) {
           calculatedDistance = map(infraredReadValue, 409, 512, 150, 100);
         } else if (infraredReadValue < 409 && infraredReadValue >= 358) {
@@ -97,19 +100,23 @@ void loop()
         } else {
           calculatedDistance = map(infraredReadValue, 280, 296, 500, 400);
         }
+      }
 
-        if (SerialDebug) {
-          String calculatedDistanceValueStr = String(i)+": "+String(calculatedDistance);
-          Serial.println(calculatedDistanceValueStr);
-        }
+      // convert from centimeters
+      float range = calculatedDistance;
+      range = range/100.0;
 
-        if (RosPublish) {
-          range_message.header.stamp = nh.now();
-          range_message.range = calculatedDistance;
-          setFrameId(i);
-          infraredPublisher.publish(&range_message);
-          nh.spinOnce();
-        }
+      if (SerialDebug) {
+        String calculatedDistanceValueStr = String(i)+": "+String(calculatedDistance);
+        Serial.println(calculatedDistanceValueStr);
+      }
+
+      if (RosPublish) {
+        range_message.header.stamp = nh.now();
+        range_message.range = range;
+        setFrameId(i);
+        infraredPublisher.publish(&range_message);
+        nh.spinOnce();
       }
     }
   }
