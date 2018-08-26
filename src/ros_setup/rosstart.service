@@ -1,0 +1,9 @@
+[Unit]
+Description=Start ROS monitor and trigger service
+
+[Service]
+Type=oneshot
+ExecStart=/home/steveo/ros_catkin_ws/src/avc/trigger.sh
+
+[Install]
+WantedBy=multi-user.target
