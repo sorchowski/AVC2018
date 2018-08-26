@@ -1,4 +1,5 @@
 #include <arduino.h>
+#include <Servo.h>
 #include <ros.h>
 #include <geometry_msgs/Twist.h>
 
@@ -20,6 +21,8 @@
 #define SERVO_CENTER 1500
 #define SERVO_MAX_RIGHT 2000
 
+#define STEERING_MAX_THETA M_PI/2
+
 ros::NodeHandle nh;
 
 float current_x_vel = 0.0;
@@ -29,9 +32,24 @@ float current_theta_vel = 0.0;
 Servo steeringServo;
 Servo escServo;
 
-int mapThetaToServo(float input_theta) {
-  // TODO: map the steering (theta_vel) to a servo value and output
+int mapThetaToServo(float theta) {
+  // TEB steering for non-holonomic (car-like) vehicles ranges from
+  // -PI/2 to PI/2
 
+  // TODO: is negative left or right? positive seems like it should be left if 0 is straight ahead.
+  int steeringResult = SERVO_CENTER;
+  float steeringRatio = theta/STEERING_MAX_THETA;
+
+  if (steeringRatio < 0.0) {
+    // Map theta to between SERVO_CENTER and SERVO_MAX_RIGHT
+    steeringRatio = steeringRatio*(-1.0);
+    steeringResult = int(((SERVO_MAX_RIGHT-SERVO_CENTER)*steeringRatio)+SERVO_CENTER);
+  } else if (theta > 0.0) {
+    // Map theta to between SERVO_CENTER and SERVO_MAX_LEFT
+    steeringResult = int(((SERVO_CENTER-SERVO_MAX_LEFT)*steeringRatio)+SERVO_MAX_LEFT);
+  }
+
+  return steeringResult;
 }
 
 int mapVelocityToServo(float input_velocity) {
@@ -53,13 +71,12 @@ int mapVelocityToServo(float input_velocity) {
   return final_esc_velocity;
 }
 
-
 void handleCmd(const geometry_msgs::Twist velocity_cmd) {
     float x_vel = velocity_cmd.linear.x;
     float y_vel = velocity_cmd.linear.y;
     float theta_vel = velocity_cmd.angular.z;
 
-    // TODO: can we really ignore y_vel for both steering and velocity? Need to test.
+    // TEB Local Planner uses x velocity for forward/backward and angular Z for steering.
 
     int steeringCmd = mapThetaToServo(theta_vel);
     steeringServo.writeMicroseconds(steeringCmd);
@@ -72,7 +89,7 @@ void handleCmd(const geometry_msgs::Twist velocity_cmd) {
     if (current_x_vel > 0.0 && x_vel < 0.0) {
       // Stop the vehicle, set speed to 0 (i.e. 1500us)
       escServo.writeMicroseconds(ESC_VELOCITY_ZERO);
-      delay(5);
+      delay(100);
     }
 
     escServo.writeMicroseconds(velocityCmd);

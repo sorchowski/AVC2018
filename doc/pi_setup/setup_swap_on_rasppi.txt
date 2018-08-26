@@ -2,3 +2,8 @@ sudo apt-get install dphys-swapfile
 
 https://raspberrypi.stackexchange.com/questions/70/how-to-set-up-swap-space
 
+Add Swap space via thumb drive:
+
+	sudo mkswap /dev/sda
+	sudo chmod 0600 /dev/sda
+	sudo swapon /dev/sda
