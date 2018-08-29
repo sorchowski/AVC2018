@@ -7,9 +7,9 @@
 #include <move_base_msgs/MoveBaseAction.h>
 #include <actionlib/client/simple_action_client.h>
 
-#define PIN_LED_RED 10
-#define PIN_LED_GREEN 9
-#define PIN_SWITCH 11
+#define PIN_LED_RED 14
+#define PIN_LED_GREEN 3
+#define PIN_SWITCH 12
 
 typedef actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction> MoveBaseClient;
 
@@ -42,11 +42,10 @@ int main(int argc, char** argv){
   // Turn the ready indicator on (this should be the green LED).
   digitalWrite(PIN_LED_GREEN, HIGH);
 
-  // TODO: Wait for input from the go switch.
-  int sitchResult = 1;
+  int switchResult = 1;
   while (switchResult) {
-    int switchResult = digitalRead(PIN_SWITCH);
-    if (switchResult==false) {
+    switchResult = digitalRead(PIN_SWITCH);
+    if (switchResult==0) {
       // Go to sleep for a bit to make sure it wasn't spurious 
       ros::Duration(0.1).sleep();
       switchResult = digitalRead(PIN_SWITCH);
@@ -55,16 +54,17 @@ int main(int argc, char** argv){
       ros::Duration(0.1).sleep();
     }
   }
+  ROS_INFO("Received GO signal");
 
-  return 0;
-  /*
+
+
   move_base_msgs::MoveBaseGoal goal;
 
   //we'll send a goal to the robot to move 1 meter forward
   goal.target_pose.header.frame_id = "base_link";
   goal.target_pose.header.stamp = ros::Time::now();
 
-  goal.target_pose.pose.position.x = 1.0;
+  goal.target_pose.pose.position.x = 4.0;
   goal.target_pose.pose.orientation.w = 1.0;
 
   ROS_INFO("Sending goal");
@@ -78,5 +78,4 @@ int main(int argc, char** argv){
     ROS_INFO("The base failed to move forward 1 meter for some reason");
 
   return 0;
-  */
 }

@@ -2,7 +2,7 @@
     <node name="node_odometry" pkg="rosserial_python" type="serial_node.py" args="/dev/rosnode_nanoA" respawn="true" />
     <node name="node_sonar" pkg="rosserial_python" type="serial_node.py" args="/dev/rosnode_sonar" respawn="true" />
     <node name="node_infrared" pkg="rosserial_python" type="serial_node.py" args="/dev/rosnode_nanoC" respawn="true" />
-    <!--node name="node_action" pkg="rosserial_python" type="serial_node.py" args="/dev/rosnode_????" respawn="true" /-->
+    <node name="node_drive" pkg="rosserial_python" type="serial_node.py" args="/dev/rosnode_nanoB" respawn="true" />
 
     <node name="avc_range_convert" pkg="avc" type="avc_range_convert" respawn="true" />
     <node name="avc_imu_convert" pkg="avc" type="avc_imu_convert" respawn="true" />
