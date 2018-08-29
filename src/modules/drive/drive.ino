@@ -21,7 +21,9 @@
 #define SERVO_CENTER 1500
 #define SERVO_MAX_RIGHT 2000
 
-#define STEERING_MAX_THETA M_PI/2
+#define STEERING_MAX_THETA_THEORETICAL 1.57079632679
+#define STEERING_MAX_THETA 1.25663706144
+
 
 ros::NodeHandle nh;
 
@@ -29,24 +31,35 @@ float current_x_vel = 0.0;
 float current_y_vel = 0.0;
 float current_theta_vel = 0.0;
 
+
+#define SERVO_PIN_STEERING 9
+#define SERVO_PIN_ESC 3
+
 Servo steeringServo;
 Servo escServo;
 
-int mapThetaToServo(float theta) {
+int mapThetaToServo(float theta) {  
   // TEB steering for non-holonomic (car-like) vehicles ranges from
   // -PI/2 to PI/2
 
+  // Clamp theta because our bot's front wheels can only rotate so far.
+  if (theta > STEERING_MAX_THETA) {
+    theta = STEERING_MAX_THETA;
+  } else if (theta < -STEERING_MAX_THETA) {
+    theta = -STEERING_MAX_THETA;
+  }
+
   // TODO: is negative left or right? positive seems like it should be left if 0 is straight ahead.
   int steeringResult = SERVO_CENTER;
-  float steeringRatio = theta/STEERING_MAX_THETA;
+  float steeringRatio = theta/STEERING_MAX_THETA_THEORETICAL;
 
-  if (steeringRatio < 0.0) {
+  if (theta < 0.0) {
     // Map theta to between SERVO_CENTER and SERVO_MAX_RIGHT
     steeringRatio = steeringRatio*(-1.0);
     steeringResult = int(((SERVO_MAX_RIGHT-SERVO_CENTER)*steeringRatio)+SERVO_CENTER);
   } else if (theta > 0.0) {
     // Map theta to between SERVO_CENTER and SERVO_MAX_LEFT
-    steeringResult = int(((SERVO_CENTER-SERVO_MAX_LEFT)*steeringRatio)+SERVO_MAX_LEFT);
+    steeringResult = int( SERVO_CENTER-((SERVO_CENTER-SERVO_MAX_LEFT)*steeringRatio) );
   }
 
   return steeringResult;
@@ -86,7 +99,7 @@ void handleCmd(const geometry_msgs::Twist velocity_cmd) {
     // esc requires the period to be set to 1500us for a brief amount of time before
     // setting the velocity to reverse. i.e. we can't go, for example, from 1700us
     // directly to 1300us.
-    if (current_x_vel > 0.0 && x_vel < 0.0) {
+    if (current_x_vel >= 0.0 && x_vel < 0.0) {
       // Stop the vehicle, set speed to 0 (i.e. 1500us)
       escServo.writeMicroseconds(ESC_VELOCITY_ZERO);
       delay(100);
@@ -113,6 +126,9 @@ void setup()
     nh.subscribe(sub);
   }
 
+  steeringServo.attach(SERVO_PIN_STEERING);
+  escServo.attach(SERVO_PIN_ESC);
+
   // Zero everything out before we start processing ROS commands
   escServo.writeMicroseconds(ESC_VELOCITY_ZERO);
   steeringServo.writeMicroseconds(SERVO_CENTER);
@@ -120,6 +136,10 @@ void setup()
 
 void loop()
 {
+
+  if (RosListen) {
     nh.spinOnce();
-    delay(5);
+  }
+
+  delay(5);
 }
