@@ -8,7 +8,7 @@
 #include <actionlib/client/simple_action_client.h>
 
 #define PIN_LED_RED 14
-#define PIN_LED_GREEN 3
+#define PIN_LED_GREEN 13
 #define PIN_SWITCH 12
 
 typedef actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction> MoveBaseClient;
@@ -65,6 +65,7 @@ int main(int argc, char** argv){
   goal.target_pose.header.stamp = ros::Time::now();
 
   goal.target_pose.pose.position.x = 4.0;
+  goal.target_post.post.position.y = 1.0;
   goal.target_pose.pose.orientation.w = 1.0;
 
   ROS_INFO("Sending goal");

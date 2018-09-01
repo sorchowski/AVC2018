@@ -69,7 +69,7 @@ sudo cp ros_nodes.rules /etc/udev/rules.d/
 echo 'Copying startup and trigger scripts'
 sudo cp rosstart.service /etc/systemd/system/
 cp trigger.sh $ROS_WORKSPACE_HOME/src/$ROS_AVC_PROJECT_NAME/
-echo 'If necessary, run the command: systemctl enable rosstart.service'
+echo 'If necessary, run the commands: sudo systemctl daemon-reload, sudo systemctl enable rosstart.service'
 
 #in top-level ros workspace directory, enter "catkin_make"
 echo "Go to $ROS_WORKSPACE_HOME/, and enter 'catkin_make'"
