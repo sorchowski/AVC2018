@@ -1,4 +1,11 @@
 <launch>
+    <arg name="x" default="4"/>
+    <arg name="y" default="1"/>
+    <arg name="z" default="0"/>
+    <arg name="roll" default="0"/>
+    <arg name="pitch" default="0"/>
+    <arg name="yaw" default="0"/>
+
     <node name="node_odometry" pkg="rosserial_python" type="serial_node.py" args="/dev/rosnode_nanoA" respawn="true" />
     <node name="node_sonar" pkg="rosserial_python" type="serial_node.py" args="/dev/rosnode_sonar" respawn="true" />
     <node name="node_infrared" pkg="rosserial_python" type="serial_node.py" args="/dev/rosnode_nanoC" respawn="true" />
