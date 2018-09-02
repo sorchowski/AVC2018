@@ -1,0 +1,46 @@
+<launch>
+    <node name="node_odometry" pkg="rosserial_python" type="serial_node.py" args="/dev/rosnode_nanoA" respawn="true" />
+    <node name="node_sonar" pkg="rosserial_python" type="serial_node.py" args="/dev/rosnode_sonar" respawn="true" />
+    <node name="node_infrared" pkg="rosserial_python" type="serial_node.py" args="/dev/rosnode_nanoC" respawn="true" />
+    <node name="node_drive" pkg="rosserial_python" type="serial_node.py" args="/dev/rosnode_nanoB" respawn="true" />
+
+    <node name="avc_range_convert" pkg="avc" type="avc_range_convert" respawn="true" />
+    <node name="avc_imu_convert" pkg="avc" type="avc_imu_convert" respawn="true" />
+    <node name="avc_quadrature_convert" pkg="avc" type="avc_quadrature_convert" respawn="true" />
+
+    <node name="node_ekf" pkg="robot_localization" type="ekf_localization_node" clear_params="true">
+        <rosparam command="load" file="$(find avc)/param/ekf_config.yaml" />
+    </node>
+
+    <!-- 90 degrees = 1.5708 radians-->
+    <!-- http://wiki.ros.org/tf#static_transform_publisher-->
+    <!--static_transform_publisher x y z yaw pitch roll frame_id child_frame_id period_in_ms-->
+
+    <node pkg="tf" type="static_transform_publisher" name="sonar1_tf" args="0.15 0.095 0 1.5708 0 0 base_link s1 100" />
+    <node pkg="tf" type="static_transform_publisher" name="sonar2_tf" args="0.20 0.08 0 1.0472 0 0 base_link s2 100" />
+    <node pkg="tf" type="static_transform_publisher" name="sonar3_tf" args="0.23 0.045 0 0.5236 0 0 base_link s3 100" />
+    <node pkg="tf" type="static_transform_publisher" name="sonar4_tf" args="0.25 0.0 0 0.0 0 0 base_link s4 100" />
+    <node pkg="tf" type="static_transform_publisher" name="sonar5_tf" args="0.23 -0.045 0 5.7596 0 0 base_link s5 100" />
+    <node pkg="tf" type="static_transform_publisher" name="sonar6_tf" args="0.20 -0.08 0 5.2359 0 0 base_link s6 100" />
+    <node pkg="tf" type="static_transform_publisher" name="sonar7_tf" args="0.15 -0.095 0 4.71239 0 0 base_link s7 100" />
+
+    <node pkg="tf" type="static_transform_publisher" name="ir_left_tf" args="0.025 0.075 0 1.5708 0 0 base_link ir_left 100" />
+    <node pkg="tf" type="static_transform_publisher" name="ir_center_tf" args="0.085 0.0 0 0.0 0 0 base_link ir_center 100" />
+    <node pkg="tf" type="static_transform_publisher" name="ir_right_tf" args="0.025 -0.095 0 4.71239 0 0 base_link ir_right 100" />
+
+    <node pkg="tf" type="static_transform_publisher" name="imu_to_bl" args="0 0 0 0 0 0 1 base_link imu 100" />
+
+    <node pkg="move_base" type="move_base" respawn="false" name="move_base">
+        <rosparam file="$(find avc)/param/costmap_common_params.yaml" command="load" ns="global_costmap" /> 
+        <rosparam file="$(find avc)/param/costmap_common_params.yaml" command="load" ns="local_costmap" />
+        <rosparam file="$(find avc)/param/local_costmap_params.yaml" command="load" />
+        <rosparam file="$(find avc)/param/global_costmap_params.yaml" command="load" /> 
+        <rosparam file="$(find avc)/param/base_local_planner_params.yaml" command="load" />
+
+        <param name="base_local_planner" value="teb_local_planner/TebLocalPlannerROS" />
+        <param name="controller_frequency" value="10.0" />
+
+    </node>
+
+    <node name="goals" pkg="avc" type="avc_simple_goals" respawn="false" />
+</launch>

@@ -77,6 +77,10 @@ void loop() {
     // Average the wheel rotations between right and left.
     float velocity = (velocity1+velocity2)/2; // in m/s
 
+    if (signed_diff1 < 0.0 || signed_diff2 < 0.0) {
+      velocity = velocity *(-1.0);
+    }
+
     last_count1=count1;
     last_count2=count2;
 
