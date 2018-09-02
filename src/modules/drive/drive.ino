@@ -53,11 +53,11 @@ int mapThetaToServo(float theta) {
   int steeringResult = SERVO_CENTER;
   float steeringRatio = theta/STEERING_MAX_THETA_THEORETICAL;
 
-  if (theta < 0.0) {
+  if (theta > 0.0) {
     // Map theta to between SERVO_CENTER and SERVO_MAX_RIGHT
     steeringRatio = steeringRatio*(-1.0);
     steeringResult = int(((SERVO_MAX_RIGHT-SERVO_CENTER)*steeringRatio)+SERVO_CENTER);
-  } else if (theta > 0.0) {
+  } else if (theta < 0.0) {
     // Map theta to between SERVO_CENTER and SERVO_MAX_LEFT
     steeringResult = int( SERVO_CENTER-((SERVO_CENTER-SERVO_MAX_LEFT)*steeringRatio) );
   }
@@ -65,23 +65,22 @@ int mapThetaToServo(float theta) {
   return steeringResult;
 }
 
-int mapVelocityToServo(float input_velocity) {
-  // add max_velocity to input
-  // upper velocity range = max_velocity*2
-  float upper_velocity_range = MAX_VELOCITY*2.0;
+// Note, 1612 seems to be the cutoff for actually making the vehicle move
 
-  // temp should be between 0.0 and 2*MAX_VELOCITY
-  float temp_velocity_value = input_velocity+MAX_VELOCITY; // We always assume max forward = abs(max reverse)
-
-  float target_range = ESC_VELOCITY_MAX_FORWARD-ESC_VELOCITY_MAX_REVERSE;
-
-  // now map temp velocity to target range
-  float temp = (temp_velocity_value/upper_velocity_range)*target_range;
-
-  // adjust the range back to our expected esc values
-  int final_esc_velocity = temp+ESC_VELOCITY_MAX_REVERSE;
-
-  return final_esc_velocity;
+int mapVelocityToServo(float velocity) {
+  // map 0 to 2.5m/s to 1600 to 2000 for + velocities, (i.e. 0.0-2.5 -> 100 to 500)
+  // map 0 to -2.5m/s to 1000 to 1400 for - velocities
+  int escValue = ESC_VELOCITY_ZERO;
+  float absoluteVelocity = abs(velocity);
+  if (velocity > 0.0) {
+    float adjustedEscVelocity = (((absoluteVelocity/MAX_VELOCITY)*380.0)+120.0);
+    escValue = ESC_VELOCITY_ZERO+(int)adjustedEscVelocity;
+  }
+  else if (velocity < 0.0) {
+    float adjustedEscVelocity = (((absoluteVelocity/MAX_VELOCITY)*360.0)+140.0);
+    escValue = ESC_VELOCITY_ZERO-(int)adjustedEscVelocity;
+  }
+  return escValue;
 }
 
 void handleCmd(const geometry_msgs::Twist velocity_cmd) {
@@ -102,7 +101,7 @@ void handleCmd(const geometry_msgs::Twist velocity_cmd) {
     if (current_x_vel >= 0.0 && x_vel < 0.0) {
       // Stop the vehicle, set speed to 0 (i.e. 1500us)
       escServo.writeMicroseconds(ESC_VELOCITY_ZERO);
-      delay(100);
+      delay(500);
     }
 
     escServo.writeMicroseconds(velocityCmd);
