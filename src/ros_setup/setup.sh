@@ -48,6 +48,7 @@ cp CMakeLists.txt $ROS_WORKSPACE_HOME/src/$ROS_AVC_PROJECT_NAME/
 cp package.xml $ROS_WORKSPACE_HOME/src/$ROS_AVC_PROJECT_NAME/
 cp avc.launch $ROS_WORKSPACE_HOME/src/$ROS_AVC_PROJECT_NAME/
 cp avc_nav.launch $ROS_WORKSPACE_HOME/src/$ROS_AVC_PROJECT_NAME/
+cp avc_full.launch $ROS_WORKSPACE_HOME/src/$ROS_AVC_PROJECT_NAME/
 
 #copy our own modules to <ros_workspace>/src/avc/src
 echo 'Copying avc source files'
