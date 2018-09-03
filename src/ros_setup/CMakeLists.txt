@@ -66,6 +66,7 @@ add_executable(avc_quadrature_convert src/node_quad_convert.cpp)
 add_executable(avc_range_convert src/node_range_convert.cpp)
 add_executable(avc_imu_convert src/node_imu_convert.cpp)
 add_executable(avc_simple_goals src/simple_navigation_goals.cpp)
+add_executable(avc_waypoint_follower src/waypoint_follower.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -83,6 +84,7 @@ target_link_libraries(avc_quadrature_convert ${catkin_LIBRARIES})
 target_link_libraries(avc_range_convert ${catkin_LIBRARIES} ${PCL_LIBRARIES})
 target_link_libraries(avc_imu_convert ${catkin_LIBRARIES})
 target_link_libraries(avc_simple_goals wiringPi ${catkin_LIBRARIES})
+target_link_libraries(avc_waypoint_follower wiringPi ${catking_LIBRARIES})
 
 #############
 ## Install ##

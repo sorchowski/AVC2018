@@ -1,11 +1,4 @@
 <launch>
-    <arg name="x" default="4"/>
-    <arg name="y" default="1"/>
-    <arg name="z" default="0"/>
-    <arg name="roll" default="0"/>
-    <arg name="pitch" default="0"/>
-    <arg name="yaw" default="0"/>
-
     <remap from="/odometry/filtered" to="/odom"/>
 
     <node name="node_odometry" pkg="rosserial_python" type="serial_node.py" args="/dev/rosnode_nanoA" respawn="true" />
@@ -52,4 +45,7 @@
     </node>
 
     <node name="goals" pkg="avc" type="avc_simple_goals" respawn="false" />
+    <node name="waypoints_follower" pkg="avc" type="avc_waypoints_follower" respawn="false">
+        <param name="waypoints" value="$(find avc)/param/waypoints.txt" />
+    </node>
 </launch>

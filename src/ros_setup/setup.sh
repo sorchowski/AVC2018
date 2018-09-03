@@ -57,8 +57,9 @@ cp ../modules/display/display.cpp $ROS_WORKSPACE_HOME/src/$ROS_AVC_PROJECT_NAME/
 cp ../modules/convert/node_quad_convert.cpp $ROS_WORKSPACE_HOME/src/$ROS_AVC_PROJECT_NAME/src/
 cp ../modules/convert/node_range_convert.cpp $ROS_WORKSPACE_HOME/src/$ROS_AVC_PROJECT_NAME/src/
 cp ../modules/convert/node_imu_convert.cpp $ROS_WORKSPACE_HOME/src/$ROS_AVC_PROJECT_NAME/src/
-cp ../modules/nav/*.yaml $ROS_WORKSPACE_HOME/src/$ROS_AVC_PROJECT_NAME/param/
+cp ../modules/nav/*.* $ROS_WORKSPACE_HOME/src/$ROS_AVC_PROJECT_NAME/param/
 cp ../modules/goals/simple_navigation_goals.cpp $ROS_WORKSPACE_HOME/src/$ROS_AVC_PROJECT_NAME/src/
+cp ../modules/goals/waypoint_follower.cpp $ROS_WORKSPACE_HOME/src/$ROS_AVC_PROJECT_NAME/src/
 
 #copy AVC/lib/common/*.* to <ros_workspace>/src/avc/include
 cp ../../lib/common/*.* $ROS_WORKSPACE_HOME/src/$ROS_AVC_PROJECT_NAME/include
