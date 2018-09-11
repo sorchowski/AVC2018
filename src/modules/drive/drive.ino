@@ -51,13 +51,13 @@ int mapThetaToServo(float theta) {
 
   // TODO: is negative left or right? positive seems like it should be left if 0 is straight ahead.
   int steeringResult = SERVO_CENTER;
-  float steeringRatio = theta/STEERING_MAX_THETA_THEORETICAL;
+  float steeringRatio = (float)theta/(float)STEERING_MAX_THETA_THEORETICAL;
 
-  if (theta > 0.0) {
+  if (theta < 0.0) {
     // Map theta to between SERVO_CENTER and SERVO_MAX_RIGHT
     steeringRatio = steeringRatio*(-1.0);
     steeringResult = int(((SERVO_MAX_RIGHT-SERVO_CENTER)*steeringRatio)+SERVO_CENTER);
-  } else if (theta < 0.0) {
+  } else if (theta > 0.0) {
     // Map theta to between SERVO_CENTER and SERVO_MAX_LEFT
     steeringResult = int( SERVO_CENTER-((SERVO_CENTER-SERVO_MAX_LEFT)*steeringRatio) );
   }
@@ -100,8 +100,13 @@ void handleCmd(const geometry_msgs::Twist velocity_cmd) {
     // directly to 1300us.
     if (current_x_vel >= 0.0 && x_vel < 0.0) {
       // Stop the vehicle, set speed to 0 (i.e. 1500us)
-      escServo.writeMicroseconds(ESC_VELOCITY_ZERO);
-      delay(500);
+      escServo.writeMicroseconds(1500);
+      delay(1000);
+      escServo.writeMicroseconds(1300);
+      delay(1000);
+      escServo.writeMicroseconds(1500);
+      delay(1000);
+      escServo.writeMicroseconds(1300);
     }
 
     escServo.writeMicroseconds(velocityCmd);

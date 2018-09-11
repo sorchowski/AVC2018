@@ -5,7 +5,7 @@ Servo testServo;
 void setup() {
   Serial.begin(9600);
   // put your setup code here, to run once:
-  testServo.attach(9);
+  testServo.attach(3);
   testServo.writeMicroseconds(1500);
   //testServo.write(90);
 
