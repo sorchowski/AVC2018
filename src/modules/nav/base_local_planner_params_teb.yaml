@@ -9,17 +9,17 @@ TebLocalPlannerROS:
  dt_ref: 0.3
  dt_hysteresis: 0.1
  global_plan_overwrite_orientation: True
- max_global_plan_lookahead_dist: 3.0
+ max_global_plan_lookahead_dist: 4.0
  feasibility_check_no_poses: 5
     
  # Robot
          
- max_vel_x: 1.0
+ max_vel_x: 0.75
  min_vel_x: 0.2
  max_vel_x_backwards: 0.2
- max_vel_theta: 0.5
+ max_vel_theta: 3.14
  acc_lim_x: 0.5
- acc_lim_theta: 0.5
+ acc_lim_theta: 3.14
  min_turning_radius: 1.0
  wheelbase: 0.324
  cmd_angle_instead_rotvel: true
@@ -29,9 +29,9 @@ TebLocalPlannerROS:
 
  # GoalTolerance
     
- xy_goal_tolerance: 0.5
- yaw_goal_tolerance: 1.0
- free_goal_vel: False
+ xy_goal_tolerance: 1.0
+ yaw_goal_tolerance: 6.28
+ free_goal_vel: True
     
  # Obstacles
     
@@ -41,7 +41,7 @@ TebLocalPlannerROS:
  obstacle_poses_affected: 30
  costmap_converter_plugin: ""
  costmap_converter_spin_thread: True
- costmap_converter_rate: 5
+ costmap_converter_rate: 3
 
  # Optimization
     
@@ -76,3 +76,4 @@ TebLocalPlannerROS:
  obstacle_heading_threshold: 0.45
  visualize_hc_graph: False
 
+ controller_frequency: 5.0

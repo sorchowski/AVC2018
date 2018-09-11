@@ -37,15 +37,15 @@
         <rosparam file="$(find avc)/param/costmap_common_params.yaml" command="load" ns="local_costmap" />
         <rosparam file="$(find avc)/param/local_costmap_params.yaml" command="load" />
         <rosparam file="$(find avc)/param/global_costmap_params.yaml" command="load" /> 
-        <rosparam file="$(find avc)/param/base_local_planner_params.yaml" command="load" />
+        <rosparam file="$(find avc)/param/base_local_planner_params_teb.yaml" command="load" />
 
         <param name="base_local_planner" value="teb_local_planner/TebLocalPlannerROS" />
         <param name="controller_frequency" value="10.0" />
 
     </node>
 
-    <node name="goals" pkg="avc" type="avc_simple_goals" respawn="false" />
-    <node name="waypoints_follower" pkg="avc" type="avc_waypoints_follower" respawn="false">
+    <!--node name="goals" pkg="avc" type="avc_simple_goals" respawn="false" /-->
+    <node name="waypoint_follower" pkg="avc" type="avc_waypoint_follower" respawn="false">
         <param name="waypoints" value="$(find avc)/param/waypoints.txt" />
     </node>
 </launch>

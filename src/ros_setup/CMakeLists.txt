@@ -84,7 +84,7 @@ target_link_libraries(avc_quadrature_convert ${catkin_LIBRARIES})
 target_link_libraries(avc_range_convert ${catkin_LIBRARIES} ${PCL_LIBRARIES})
 target_link_libraries(avc_imu_convert ${catkin_LIBRARIES})
 target_link_libraries(avc_simple_goals wiringPi ${catkin_LIBRARIES})
-target_link_libraries(avc_waypoint_follower wiringPi ${catking_LIBRARIES})
+target_link_libraries(avc_waypoint_follower wiringPi ${catkin_LIBRARIES})
 
 #############
 ## Install ##

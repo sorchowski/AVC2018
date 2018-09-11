@@ -34,4 +34,8 @@
 
     <!--node pkg="tf" type="static_transform_publisher" name="bf_to_bl" args="0 0 0 0 0 0 1 base_footprint base_link 500" /-->
 
+    <node name="waypoint_follower" pkg="avc" type="avc_waypoint_follower" respawn="false">
+        <param name="waypoints" value="$(find avc)/param/waypoints.txt" />
+    </node>
+
 </launch>
