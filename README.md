@@ -4,7 +4,7 @@ This was all my work (well, almost all of it) for the 2018 Sparkfun Autonomous V
 
 [Some photos of the bot and the competition](doc/images)
 
-[A post-mortem writeup of my competition experience](doc/avc-post-mortem.txt)
+[A post-mortem writeup of my competition experience](doc/avc-post-mortem.md)
 
 ## Bot structure
 
