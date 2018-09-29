@@ -6,14 +6,11 @@
 
 ## How it went down
 
-Round 1
-	Bot doesn’t start. ESC light was green, never synced with Arduino. Turned out to be signal wire came loose from Arduino. Amazingly, the bot next to me failed to start as well!
+* Round 1: Bot doesn’t start. ESC light was green, never synced with Arduino. Turned out to be signal wire came loose from Arduino. Amazingly, the bot next to me failed to start as well!
 
-Round 2
-	Bot started, veered left, blocked the Lockheed team’s bot. Lots of fun.
+* Round 2: Bot started, veered left, blocked the Lockheed team’s bot. Lots of fun.
 
-Round 3
-	Bot looked ok to go. Flipped switch. Nothing. Turns out the bot had lost the wifi connection so the terminal on which the launch file had executed was lost. Next time, start it as a systemd service.
+* Round 3: Bot looked ok to go. Flipped switch. Nothing. Turns out the bot had lost the wifi connection so the terminal on which the launch file had executed was lost. Next time, start it as a systemd service.
 	
 ## Some things I learned the past two days
 
@@ -51,25 +48,26 @@ Round 3
 
 ## Some immediate changes I’d like to make
 
-	Simpler ESC without the weird reverse control.
-	Avc github project restructure to make workflow easier.
-	Better shocks.
-	straight/true steering.
-	Proper battery holder.
-	Finer encoder counts.
-	Filter to smooth out velocity calculation
-	Play with ROS ekf to see if the extraneous y velocity can be reduced.
-	Test how many messages you can send from the IMU to the PI.
-	Test the maximum baud of the rosserial library.
-	Test the GPS and nmea driver of ROS to see what happens.
+* Simpler ESC without the weird reverse control.
+* Avc github project restructure to make workflow easier.
+* Better shocks.
+* straight/true steering.
+* Proper battery holder.
+* Finer encoder counts.
+* Filter to smooth out velocity calculation
+* Play with ROS ekf to see if the extraneous y velocity can be reduced.
+* Test how many messages you can send from the IMU to the PI.
+* Test the maximum baud of the rosserial library.
+* Test the GPS and nmea driver of ROS to see what happens.
 
 ## Strategies for bot next year
 
-Button up the vehicle more so important wires can’t come loose during operation.
+* Button up the vehicle more so important wires can’t come loose during operation.
 
-Add RealSense vision processing.
+* Add RealSense vision processing.
 
-Pare down the number of Arduinos to one or two if possible. Use a Mega perhaps or Due.
-Ditch the PI for a beefier processor (i.e Nvidia Jetson).
+* Pare down the number of Arduinos to one or two if possible. Use a Mega perhaps or Due.
 
-Ditch planning stack of ROS, but keep the messaging structure (at least for development). The idea is ROS provides some great visualization, logging, and playback capabilities. These can help develop the non-vision sensors.
+* Ditch the PI for a beefier processor (i.e Nvidia Jetson).
+
+* Ditch planning stack of ROS, but keep the messaging structure (at least for development). The idea is ROS provides some great visualization, logging, and playback capabilities. These can help develop the non-vision sensors.
